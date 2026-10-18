@@ -1,0 +1,63 @@
+{
+  "name": "@ets/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Stanwell-branded Vue components, built on @vuetify/v0 headless primitives.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.vue",
+    "./composite/*": "./src/composite/*",
+    "./composables/*": "./src/composables/*.ts",
+    "./table/*": "./src/table/*",
+    "./blade/*": "./src/blade/*",
+    "./layout/*": "./src/layout/*",
+    "./format/*": "./src/format/*",
+    "./icons": "./src/icons/index.ts",
+    "./router/*": "./src/router/*",
+    "./editor/createEtsEditorPlugin": "./src/editor/createEtsEditorPlugin.ts",
+    "./styles/theme.css": "./src/styles/theme.css",
+    "./styles/base.css": "./src/styles/base.css",
+    "./styles/blade.css": "./src/styles/blade.css",
+    "./styles/layout.css": "./src/styles/layout.css",
+    "./styles/table.css": "./src/styles/table.css",
+    "./styles/editor.css": "./src/styles/editor.css"
+  },
+  "scripts": {
+    "build:icons": "node scripts/build-icons.mjs",
+    "test:unit": "vitest run",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@iconify/vue": "catalog:",
+    "@ets/brand": "workspace:*",
+    "@vuetify/v0": "catalog:",
+    "croner": "^10.0.1",
+    "cronstrue": "^3.24.0"
+  },
+  "peerDependencies": {
+    "@ets/editor": "workspace:*",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@ets/editor": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "catalog:",
+    "@iconify/utils": "^3.0.2",
+    "@ets/editor": "workspace:*",
+    "@ets/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "jsdom": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

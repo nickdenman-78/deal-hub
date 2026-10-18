@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@ets/tsconfig/vue-app.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "noEmit": true,
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  // vite.config.ts is deliberately excluded, matching apps/config-admin: it is
+  // Node-side config typed against vite/vitest rather than app code, and
+  // including it drags their .d.ts chains through this project's compiler
+  // options for no benefit.
+  "include": ["src/**/*.ts", "src/**/*.vue"]
+}

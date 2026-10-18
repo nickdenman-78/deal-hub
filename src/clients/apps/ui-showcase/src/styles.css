@@ -1,0 +1,432 @@
+/* Import order matters and is enforced by the CSS parser rather than by
+   convention: @import must precede all rules except @charset and @layer.
+     fonts  — the faces
+     theme  — the tokens, which everything below reads
+     base   — the reset, which reads them
+
+   Note what is NOT here: `@layer app, primevue;`. That declaration was line 1
+   of every SPA's styles.css because PrimeVue emitted its own cascade layer and
+   the app had to out-sort it. @vuetify/v0 ships no CSS at all, so there are no
+   layers to order. See src/clients/CONTEXT.md. */
+@import '@ets/brand/fonts.css';
+@import '@ets/ui/styles/theme.css';
+@import '@ets/ui/styles/base.css';
+@import '@ets/ui/styles/blade.css';
+@import '@ets/ui/styles/layout.css';
+@import '@ets/ui/styles/table.css';
+@import '@ets/ui/styles/editor.css';
+
+/* --- Harness chrome only. Nothing below ships in @ets/ui. --- */
+
+/*
+ * The SPA base stylesheet forces `html { overflow-y: scroll }` so centred
+ * layouts do not shift when a page gains a scrollbar. This harness scrolls
+ * inside AppLayout's main / .sb__view instead, so that document bar is always
+ * empty — hide it here only.
+ */
+html {
+  overflow-y: hidden;
+}
+
+.sb {
+  height: 100dvh;
+  min-height: 100%;
+}
+
+.sb--blank {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-canvas);
+}
+
+.sb__blank-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-block-end: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+}
+
+.sb__blank-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* Search trigger lives inside Popover.Activator (already a <button>). */
+.sb__search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 2rem;
+  padding: var(--sp-1) var(--sp-2) var(--sp-1) var(--sp-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+
+.sb__search-trigger:hover {
+  background: var(--bg-surface-2);
+  color: var(--fg-primary);
+}
+
+.sb__search-kbd {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: var(--sp-1);
+  padding: 0.1em 0.4em;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface-2);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+}
+
+.sb__search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: min(22rem, calc(100vw - var(--sp-8)));
+}
+
+.sb__search-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  max-height: min(24rem, 50vh);
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.sb__search-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.sb__search-item:hover,
+.sb__search-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.sb__search-item-title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+
+.sb__search-item-meta {
+  color: var(--fg-muted);
+  font-size: var(--fs-xs);
+}
+
+.sb__search-item.is-active .sb__search-item-meta,
+.sb__search-item:hover .sb__search-item-meta {
+  color: var(--accent-ink);
+  opacity: 0.8;
+}
+
+.sb__search-empty {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.sb__blank-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--sp-4);
+}
+
+.sb__footer-chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.sb__footer-chrome--rail {
+  justify-content: center;
+}
+
+.sb__submenu {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.sb__submenu-label {
+  flex: none;
+  color: var(--fg-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+}
+
+.sb__submenu-nav {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.sb__submenu-search {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+.sb__sublink {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sb__sublink:hover,
+.sb__sublink.is-open {
+  background: var(--bg-surface-2);
+  color: var(--fg-default);
+}
+
+.sb__sublink.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: var(--fw-medium);
+}
+
+/* Prefix-matched leaves (blade stack) must not light up via vue-router's
+   exact active class alone — we drive .is-active from leafMatches. The same
+   applies inside MegaMenu panels, whose items are RouterLinks too. */
+.sb__sublink.router-link-active:not(.is-active),
+.sb__submenu .r-mega-menu__item.router-link-active:not(.is-active) {
+  background: transparent;
+  color: var(--fg-muted);
+  font-weight: inherit;
+}
+
+.sb__page-head {
+  flex: none;
+  margin-bottom: var(--sp-6);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sb__page-head h1 {
+  /* Size comes from base.css (h1 → --fs-3xl). Do not flatten to --fs-xl —
+     that made page titles look the same as specimen h3s. */
+  margin: 0;
+}
+
+.sb__view {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  /* Shared inset for page-head + route content so their left edges align. */
+  padding: var(--sp-4);
+  /* Only paint a scrollbar when content actually overflows. */
+  overflow: auto;
+}
+
+/* List page / blade stack / app-layout demo: edge-to-edge under the submenu
+   so footers and the blade viewport can meet the sidebar. Content that still
+   wants an inset pads itself (see ListPageView).
+   `overflow: hidden` (not auto): flush pages own their own scrollports. If this
+   view scrolled too, sticky table headers would attach to a non-scrolling
+   `.list-page__body` and never detach. */
+.sb__view--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Side-by-side light/dark. The whole reason the harness exists: a contrast
+   failure in one theme is invisible while you are looking at the other. */
+.sb__modes {
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.sb__mode {
+  padding: var(--sp-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  background: var(--bg-app);
+}
+
+.sb__mode > h4 {
+  margin-bottom: var(--sp-3);
+  color: var(--fg-muted);
+  font-family: var(--font-ui);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+}
+
+.sb__section {
+  margin-bottom: var(--sp-8);
+}
+
+.sb__section > h3 {
+  margin-bottom: var(--sp-1);
+}
+
+/* Prop / API tables — once per leaf, outside Specimen (no light/dark dupe). */
+.sb__api > p {
+  max-width: 68ch;
+  margin-bottom: var(--sp-3);
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.sb__api-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.sb__api-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+}
+
+.sb__api-table th,
+.sb__api-table td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: start;
+  vertical-align: top;
+}
+
+.sb__api-table th {
+  border-bottom-color: var(--border-default);
+  color: var(--fg-secondary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sb__api-table code {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+}
+
+.sb__api-type {
+  color: var(--fg-secondary);
+  word-break: break-word;
+}
+
+.sb__api-empty {
+  color: var(--fg-muted);
+}
+
+/* Usage snippets — companion to PropsTable, also outside Specimen. */
+.sb__code-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+
+.sb__code-head > h3 {
+  margin: 0;
+}
+
+.sb__code-copy {
+  flex: none;
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  color: var(--fg-secondary);
+  font: inherit;
+  font-size: var(--fs-xs);
+  cursor: pointer;
+}
+
+.sb__code-copy:hover {
+  background: var(--bg-surface-3);
+  color: var(--fg-primary);
+}
+
+.sb__code-pre {
+  margin: 0;
+  padding: var(--sp-4);
+  overflow-x: auto;
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-md);
+  background: var(--bg-surface-2);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: var(--lh-snug);
+}
+
+.sb__code-pre code {
+  font: inherit;
+  white-space: pre;
+}
+
+.sb__section > p {
+  max-width: 68ch;
+  margin-bottom: var(--sp-3);
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+}
+
+.sb__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.sb__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Central Package Management: versions live here only; <PackageReference> in a csproj carries no Version.
+       Seeded with the generic platform set used by the retail-systems modular monolith (versions as of
+       October 2026). Add packages here first, then reference them. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <!-- No per-project VersionOverride: every version is decided here. -->
+    <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- .NET Aspire — local orchestration. The AppHost SDK version is pinned in global.json (msbuild-sdks) — MSBuild SDKs
+         cannot be versioned here — and must match the Aspire.Hosting.* versions below. -->
+    <PackageVersion Include="Aspire.Hosting.Keycloak" Version="13.6.1-preview.1.26506.6" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.RabbitMQ" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.Redis" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.Seq" Version="13.6.1" />
+    <!-- Referenced directly by the AppHost only: Aspire.Hosting pulls MessagePack 2.5.302 (moderate
+         advisory GHSA-qhrr-8q5h-9q3h), and the AppHost has transitive pinning off (ADR-0007). -->
+    <PackageVersion Include="MessagePack" Version="2.5.307" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.17.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
+    <!-- ASP.NET Core / EF Core / Microsoft.Extensions: one patch line (10.0.x) for all of them. Transitive pinning
+         turns any package left on an older patch into NU1109 "detected package downgrade" when another
+         package needs the newer one, so bump them together. -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
+    <!-- Transitive pin: Microsoft.AspNetCore.OpenApi -> Microsoft.OpenApi 2.0.0 has a known high-severity
+         vulnerability (GHSA-v5pm-xwqc-g5wc); pin forward within 2.x. -->
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.12.2" />
+    <!-- OpenAPI reference UI (Scalar, not Swagger UI). -->
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.16.17" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.13" />
+    <!-- Transitive pin: Microsoft.Data.Sqlite pulls vulnerable lib.e_sqlite3 2.1.11 (GHSA-2m69-gcr7-jv3q). -->
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.13" />
+    <!-- PostgreSQL (ADR-0010) -->
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
+    <!-- Logging -->
+    <PackageVersion Include="Serilog" Version="4.4.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
+    <!-- Validation & CQRS decoration -->
+    <PackageVersion Include="FluentValidation" Version="12.2.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
+    <PackageVersion Include="Scrutor" Version="7.0.0" />
+    <!-- Analysis -->
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.35.0.4138" />
+    <!-- Testing (xUnit v3) -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <!-- Architecture tests (ADR-0018): ArchUnitNET with its xUnit v3 integration. -->
+    <PackageVersion Include="TngTech.ArchUnitNET.xUnitV3" Version="0.13.4" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.13" />
+    <!-- TODO (ADR-0010 to 0018): add with current versions before first restore —
+         Aspire.Npgsql.EntityFrameworkCore.PostgreSQL, Aspire.StackExchange.Redis, Aspire.RabbitMQ.Client,
+         Dapper,
+         WolverineFx, WolverineFx.RabbitMQ, WolverineFx.EntityFrameworkCore, WolverineFx.Postgresql,
+         WolverineFx.Marten, Marten, ZiggyCreatures.FusionCache (+ .Backplane.StackExchangeRedis,
+         .Serialization.SystemTextJson), Microsoft.Extensions.Caching.Hybrid, Quartz.Extensions.Hosting,
+         Quartz.Serialization.SystemTextJson, Serilog.Sinks.OpenTelemetry (optional), Npgsql.OpenTelemetry,
+         Testcontainers.PostgreSql, Testcontainers.Redis, Testcontainers.RabbitMq, Testcontainers.Keycloak,
+         Bogus, Respawn. -->
+  </ItemGroup>
+</Project>

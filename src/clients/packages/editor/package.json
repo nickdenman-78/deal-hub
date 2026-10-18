@@ -1,0 +1,52 @@
+{
+  "name": "@ets/editor",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless Monaco code editors and sanitised markdown. Opt-in: deliberately NOT part of @ets/ui. Skin via createEtsEditorPlugin + @ets/ui/styles/editor.css.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./appearance": "./src/appearance.ts",
+    "./chrome": "./src/chrome.ts",
+    "./components/*": "./src/components/*.vue",
+    "./markdown/*": "./src/markdown/*.ts",
+    "./monaco/*": "./src/monaco/*.ts"
+  },
+  "scripts": {
+    "test:unit": "vitest run",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@tiptap/core": "catalog:",
+    "@tiptap/extension-link": "catalog:",
+    "@tiptap/extensions": "catalog:",
+    "@tiptap/pm": "catalog:",
+    "@tiptap/starter-kit": "catalog:",
+    "@tiptap/vue-3": "catalog:",
+    "dompurify": "catalog:",
+    "markdown-it": "catalog:",
+    "node-diff3": "^3.2.0"
+  },
+  "peerDependencies": {
+    "monaco-editor": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@ets/tsconfig": "workspace:*",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "jsdom": "catalog:",
+    "monaco-editor": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "monaco-editor": {
+      "optional": true
+    }
+  }
+}

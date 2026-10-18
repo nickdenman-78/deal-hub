@@ -1,0 +1,19 @@
+# Force LF in the working tree for the whole frontend workspace.
+#
+# core.autocrlf is true on Windows clones here, so without this these files check
+# out with CRLF while Prettier is configured with endOfLine: "lf". The result is
+# that `pnpm format:check` passes on Linux CI and fails on every Windows machine
+# — for files nobody edited.
+#
+# Scoped to src/clients deliberately: normalising the whole repository would
+# renormalise the .NET sources too, which is a much larger change than this one.
+* text=auto eol=lf
+
+# Binary assets must not be touched by any of the above.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

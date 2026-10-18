@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Shared presentation: endpoint discovery and mapping, Result-to-HTTP translation and the global exception handler.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Ets.Core.Application\Ets.Core.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

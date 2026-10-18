@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@ets/tsconfig base",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    // "bundler" is required, not preferred: shared @ets/* packages are consumed
+    // as raw source through their exports map, and only this resolution mode
+    // honours it. See src/clients/CONTEXT.md.
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  }
+}

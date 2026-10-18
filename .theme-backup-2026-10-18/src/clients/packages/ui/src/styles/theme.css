@@ -1,0 +1,15 @@
+/* @ets/ui theme entrypoint — and the sync target for the design mirror.
+ *
+ * The token VALUES do not live here. They live in @ets/brand, because that
+ * package is framework-free by contract and is consumed by surfaces that can
+ * never run Vue — the config-help and developer-docs VitePress sites both
+ * import it directly. Putting the palette behind @ets/ui would cut those two
+ * off from the Stanwell brand entirely.
+ *
+ * So this file is a re-export, and ./retail-ui-design/theme.css mirrors
+ * packages/brand/src/tokens.css. See the "Design system" note in CLAUDE.md.
+ */
+
+@import '@ets/brand/tokens.css';
+@import '@ets/brand/scrollbars.css';
+@import './severity.css';
