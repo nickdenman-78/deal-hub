@@ -1,0 +1,23 @@
+{
+  "name": "@ets/brand",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework-free design tokens, fonts, and logos. Survives a component-library change.",
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./fonts.css": "./src/fonts.css",
+    "./scrollbars.css": "./src/scrollbars.css",
+    "./assets/*": "./src/assets/*"
+  },
+  "scripts": {
+    "test:unit": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource-variable/ibm-plex-sans": "catalog:",
+    "@fontsource/ibm-plex-mono": "catalog:"
+  },
+  "devDependencies": {
+    "vitest": "catalog:"
+  }
+}

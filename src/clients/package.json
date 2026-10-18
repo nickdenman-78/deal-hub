@@ -1,0 +1,24 @@
+{
+  "name": "@ets/clients",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "pnpm workspace root for the ETS frontends. Scripts only — no source lives here.",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm --filter \"@ets/app-*\" build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test:unit",
+    "lint": "pnpm -r --if-present lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev": "pnpm --filter \"@ets/app-ets\" dev",
+    "showcase": "pnpm --filter \"@ets/app-ui-showcase\" dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}

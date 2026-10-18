@@ -1,0 +1,10 @@
+node_modules/
+**/dist/
+pnpm-lock.yaml
+
+# Generated from the .NET contracts, if/when an API generator is added.
+**/src/api/generated/
+
+# Agent skill references are vendored prose.
+.claude/
+.agents/

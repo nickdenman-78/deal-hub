@@ -1,0 +1,39 @@
+{
+  "name": "@ets/app-ets",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ETS trading SPA — deal capture, settlement and risk. Built with Vite; talks to Ets.Servers.Api.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "preview": "vite preview",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@ets/brand": "workspace:*",
+    "@ets/ui": "workspace:*",
+    "@iconify/vue": "catalog:",
+    "@vuetify/v0": "catalog:",
+    "oidc-client-ts": "catalog:",
+    "pinia": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@ets/eslint-config": "workspace:*",
+    "@ets/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "eslint": "catalog:",
+    "jsdom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

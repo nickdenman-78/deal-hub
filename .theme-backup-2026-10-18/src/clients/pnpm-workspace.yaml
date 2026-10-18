@@ -1,0 +1,61 @@
+# The pnpm workspace root for every ETS frontend.
+#
+# Rooted HERE, at src/clients, so the .NET solution above it is unaffected and
+# the frontends share one lockfile and one node_modules. Mirrors the layout of
+# retail-systems/src/clients, from which @ets/brand, @ets/ui, @ets/editor,
+# @ets/tsconfig and @ets/eslint-config were copied (see CONTEXT.md).
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# pnpm 10.16+ reads dependency build-script policy from here.
+#   esbuild   — fetches its platform binary in a postinstall; `vite build` needs it.
+#   vue-demi  — postinstall switches its Vue 2/3 shim.
+# Central version management — the JS analogue of Directory.Packages.props.
+# Consumers write "vue": "catalog:" instead of a literal range.
+#
+# Catalogue only what genuinely MUST agree across apps — the shared toolchain,
+# and anything a package under packages/ peer-depends on. Notably:
+#
+#   @vuetify/v0 coordinates through provide/inject, so two resolved copies
+#   would not error — a Tabs.Item would simply never find its Tabs.Root.
+#
+#   monaco-editor's language services are global registries; a second copy
+#   makes completions silently never appear. Only relevant once an app adopts
+#   @ets/editor.
+#
+#   @iconify/vue and @iconify-json/lucide must agree with what @ets/ui renders.
+catalog:
+  '@fontsource-variable/jetbrains-mono': ^5.3.0
+  '@fontsource-variable/outfit': ^5.3.0
+  '@fontsource-variable/roboto': ^5.3.0
+  '@fontsource/titillium-web': ^5.3.0
+  '@iconify-json/lucide': ^1.2.122
+  '@iconify/vue': ^5.0.1
+  '@tiptap/core': ^3.29.2
+  '@tiptap/extension-link': ^3.29.2
+  '@tiptap/extensions': ^3.29.2
+  '@tiptap/pm': ^3.29.2
+  '@tiptap/starter-kit': ^3.29.2
+  '@tiptap/vue-3': ^3.29.2
+  '@types/node': ^22.10.2
+  '@vitejs/plugin-vue': ^5.2.1
+  '@vue/test-utils': ^2.4.6
+  '@vuetify/v0': ^1.0.3
+  dompurify: ^3.4.2
+  eslint: ^9.17.0
+  jsdom: ^25.0.1
+  markdown-it: ^14.1.1
+  monaco-editor: ^0.52.0
+  oidc-client-ts: ^3.1.0
+  pinia: ^2.3.0
+  typescript: ^5.7.2
+  vite: ^6.0.5
+  vitest: ^2.1.8
+  vue: ^3.5.13
+  vue-router: ^4.5.0
+  vue-tsc: ^2.1.10
+
+allowBuilds:
+  esbuild: true
+  vue-demi: true

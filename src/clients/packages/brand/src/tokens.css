@@ -1,0 +1,455 @@
+/* ETS design tokens — "Night Desk".
+ *
+ * Framework-free by contract: plain CSS custom properties only, no dependency
+ * on any component library. This is the package that survives replacing a
+ * component library — anything library-shaped belongs in @ets/ui instead.
+ * See src/clients/CONTEXT.md.
+ *
+ * Night Desk is the ETS look, deliberately distinct from the Stanwell Retail
+ * brand this package was copied from: ink grounds, one violet accent for
+ * interaction, and a blue/orange pair for buy/sell and gain/loss. Blue/orange
+ * rather than green/red so the pair still separates for deuteranopes, who are
+ * a meaningful share of any trading floor. Dark is the default theme for the
+ * SPA (see apps/ets/src/main.ts); light is kept at full parity.
+ *
+ * Colours are stored as resolved values (`#6e5bef`), NOT as HSL channel
+ * triplets. Channels only exist to feed Tailwind's `hsl(var(--x) / <alpha>)`
+ * opacity syntax; there is no Tailwind in this workspace, so channels would buy
+ * nothing and cost every use site an `hsl()` wrapper that fails silently when
+ * forgotten. Where a translucent variant is needed, use `color-mix()`.
+ *
+ * Three layers, in order:
+ *   1. PRIMITIVES  — the raw palette (`--nd-*`). Theme-invariant. Never
+ *                    referenced by components; semantic tokens exist so a
+ *                    component never has to know that "the accent" happens to
+ *                    be violet.
+ *   2. SEMANTIC    — role-named, and the only layer components should use.
+ *                    Every token here MUST be defined in both light and dark.
+ *   3. SCALES      — spacing, type, radius, motion, panel widths. Theme-
+ *                    invariant, so they live outside the light/dark blocks.
+ */
+
+/* =============================================================================
+   1. PRIMITIVES — the Night Desk palette
+   ============================================================================= */
+:root {
+  /* Accent — violet. 600 is the primary fill (white text passes AA on it in
+     both themes); 400 is the accent hue on dark grounds. */
+  --nd-violet-50: #f3f1ff;
+  --nd-violet-100: #e6e2ff;
+  --nd-violet-200: #cdc5ff;
+  --nd-violet-300: #b3a6ff;
+  --nd-violet-400: #9d8cff;
+  --nd-violet-500: #8270fa;
+  --nd-violet-600: #6e5bef;
+  --nd-violet-700: #5a46d6;
+  --nd-violet-800: #4635ad;
+  --nd-violet-900: #33267f;
+
+  /* Buy / gain — blue. */
+  --nd-blue-300: #8cc4ff;
+  --nd-blue-400: #5aa9ff;
+  --nd-blue-600: #1f6fc4;
+  --nd-blue-700: #175a9f;
+
+  /* Sell / loss — orange. */
+  --nd-orange-300: #ffb57d;
+  --nd-orange-400: #ff9a4d;
+  --nd-orange-600: #c2560f;
+  --nd-orange-700: #8f3f0a;
+
+  /* Status hues. Amber and red are kept clear of the orange above so a
+     pending deal or a breached limit never reads as "a sell". */
+  --nd-green-300: #7fd69b;
+  --nd-green-700: #15803d;
+  --nd-amber-300: #f0d36b;
+  --nd-amber-700: #a16207;
+  --nd-red-400: #ff6b76;
+  --nd-red-700: #c42b3a;
+
+  /* Neutrals — cool blue-greys. 950 is the dark app ground, 900 the dark
+     panel, 850 a raised dark surface. */
+  --nd-ink-0: #ffffff;
+  --nd-ink-25: #f9fafb;
+  --nd-ink-50: #f2f4f7;
+  --nd-ink-100: #e6e9ee;
+  --nd-ink-200: #d3d8df;
+  --nd-ink-300: #b5bdc8;
+  --nd-ink-400: #8f9aa9;
+  --nd-ink-500: #636e7d;
+  --nd-ink-600: #4c5665;
+  --nd-ink-700: #363f4c;
+  --nd-ink-750: #2a333f;
+  --nd-ink-800: #222a34;
+  --nd-ink-850: #1c232c;
+  --nd-ink-900: #151a21;
+  --nd-ink-950: #0e1116;
+
+  /* Brand gradient — violet into buy-blue. Illustration dividers and empty
+     states only; never as a chrome border substitute. */
+  --gradient-brand: linear-gradient(to bottom, var(--nd-violet-400) 0%, var(--nd-blue-400) 100%);
+  --gradient-brand-inline: linear-gradient(to right, var(--nd-violet-400) 0%, var(--nd-blue-400) 100%);
+
+  /* The editable-field tint. Any editable cell or input carries it, which is
+     how an operator tells at a glance what they are allowed to change. Light
+     values here; the dark pair is literal in the dark block. */
+  --nd-editable-tint: #eeebff;
+  --nd-editable-strong: #ddd6ff;
+}
+
+/* =============================================================================
+   2. SEMANTIC — LIGHT
+   =============================================================================
+   Two selectors, mirroring the dark block below:
+
+     :root                      — the default for the document.
+     :where([data-theme='light']) — an explicitly-light SUBTREE inside a dark
+                                    document.
+
+   The second is not redundant. Without it, `[data-theme="light"]` on a <div>
+   matches nothing at all, so the div simply inherits whatever :root resolved
+   to — and a "light" panel inside a dark page renders dark. Custom properties
+   inherit; they are not re-derived per element.
+
+   Specificity is fine as written: on <html> the dark block's `:root:where(…)`
+   is (0,1,0) and later in source, so it wins; on a subtree only one of the two
+   `:where(…)` selectors can match, so there is nothing to tie-break. */
+:root,
+:where([data-theme='light']) {
+  /* — Surfaces — */
+  --bg-app: var(--nd-ink-50); /* page background, outside cards */
+  --bg-surface: var(--nd-ink-0); /* card / panel */
+  --bg-surface-2: var(--nd-ink-25); /* zebra row, subtle pop */
+  --bg-surface-3: var(--nd-ink-100); /* inset wells, code pills */
+  --bg-header: var(--nd-ink-0); /* top app bar */
+  --bg-overlay: rgb(14 17 22 / 45%); /* modal scrim */
+  --bg-editable: var(--nd-editable-tint);
+  --bg-editable-hover: var(--nd-editable-strong);
+
+  /* — Lines — */
+  --border-subtle: var(--nd-ink-100);
+  --border-default: var(--nd-ink-200);
+  --border-strong: var(--nd-ink-300);
+  --border-input: var(--nd-ink-300);
+  --border-focus: var(--nd-violet-600);
+
+  /* — Foregrounds —
+     Measured against --bg-app, not pure white, since that is where most labels
+     sit: muted 6.7:1, faint 4.7:1, link 5.8:1. */
+  --fg-primary: var(--nd-ink-950);
+  --fg-secondary: var(--nd-ink-700);
+  --fg-muted: var(--nd-ink-600);
+  --fg-faint: var(--nd-ink-500);
+  --fg-on-accent: var(--nd-ink-0);
+  --fg-link: var(--nd-violet-700);
+
+  /* — Accent —
+     `-soft` is a tint for backgrounds; `-ink` is text ON that tint, darkened
+     until it measures past 4.5:1 against its own `-soft`. */
+  --accent: var(--nd-violet-600);
+  --accent-strong: var(--nd-violet-700);
+  --accent-soft: var(--nd-violet-100);
+  --accent-ink: var(--nd-violet-800);
+  --accent-bar: var(--nd-violet-600); /* underline beneath active nav */
+
+  /* — SOLID FILLS —
+     The background for anything that carries text ON the hue: a primary
+     button, a solid status chip. Violet-600 carries white at 4.8:1, so unlike
+     a mid-lightness hue it needs no inversion between themes.
+
+     Keep the plain hue for borders, icons, focus rings and chart series —
+     places where nothing sits on top of it. */
+  --accent-fill: var(--nd-violet-600);
+  --neutral-fill: var(--nd-ink-600);
+  --neutral-on: var(--nd-ink-0);
+
+  /* — Status — */
+  --success: var(--nd-green-700);
+  --success-soft: #e3f5e9;
+  --success-ink: #116632;
+  --success-fill: var(--nd-green-700);
+  --success-on: var(--nd-ink-0);
+
+  --warning: var(--nd-amber-700);
+  --warning-soft: #fdf3d7;
+  --warning-ink: #7a4a05;
+  --warning-fill: var(--nd-amber-700);
+  --warning-on: var(--nd-ink-0);
+
+  --error: var(--nd-red-700);
+  --error-soft: #fde6e8;
+  --error-ink: #9b1f2c;
+  --error-fill: var(--nd-red-700);
+  --error-on: var(--nd-ink-0);
+
+  --info: var(--nd-blue-600);
+  --info-soft: #e2efff;
+  --info-ink: var(--nd-blue-700);
+  --info-fill: var(--nd-blue-600);
+  --info-on: var(--nd-ink-0);
+
+  /* — Trading direction —
+     Buy/sell for side chips, gain/loss for P&L and MtM figures. Gain/loss are
+     text colours and pass 4.5:1 on --bg-surface. */
+  --buy: var(--nd-blue-600);
+  --buy-soft: #e2efff;
+  --buy-ink: var(--nd-blue-700);
+  --sell: var(--nd-orange-600);
+  --sell-soft: #fdeadb;
+  --sell-ink: var(--nd-orange-700);
+  --gain: var(--nd-blue-600);
+  --loss: var(--nd-orange-600);
+
+  /* — KPI tiles (dashboard metric row) — */
+  --kpi-1: var(--nd-violet-400);
+  --kpi-2: var(--nd-blue-400);
+  --kpi-3: var(--nd-amber-300);
+  --kpi-4: var(--nd-orange-400);
+
+  /* — Elevation —
+     Cards stay borderline-flat; shadow is reserved for things that genuinely
+     float (menus, dialogs). Borders carry most of the layout. */
+  --shadow-sm: 0 1px 2px rgb(14 17 22 / 5%);
+  --shadow-md: 0 1px 3px rgb(14 17 22 / 9%), 0 1px 2px rgb(14 17 22 / 5%);
+  --shadow-lg: 0 12px 24px -8px rgb(14 17 22 / 14%), 0 4px 8px -4px rgb(14 17 22 / 8%);
+  --shadow-panel: 0 1px 3px rgb(14 17 22 / 6%);
+  --shadow-modal: 0 24px 48px -12px rgb(14 17 22 / 30%);
+
+  /* — Scrollbars —
+     Colours only; size is theme-invariant (see scales). Chrome rules live in
+     ./scrollbars.css. */
+  --scrollbar-track: color-mix(in srgb, var(--nd-ink-100) 55%, transparent);
+  --scrollbar-thumb: color-mix(in srgb, var(--nd-ink-300) 85%, var(--nd-violet-400));
+  --scrollbar-thumb-hover: color-mix(in srgb, var(--nd-ink-400) 55%, var(--nd-violet-500));
+  --scrollbar-thumb-active: var(--nd-violet-600);
+
+  /* — Blade stack scrim — the aside's backdrop. */
+  --blade-scrim: rgb(14 17 22 / 42%);
+
+  /* — Legacy retail tokens —
+     Still referenced by copied components. Redefined in terms of the palette
+     rather than deleted, so existing call sites keep working. Prefer the
+     semantic tokens directly in new code.
+
+     Note these point at PRIMITIVES, not at the semantic tokens above, and are
+     restated in the dark block. Writing `--ets-code-bg: var(--bg-surface-3)`
+     looks tidier and is wrong: a custom property that references another
+     resolves at the element carrying the declaration, so an alias declared only
+     on :root freezes to :root's value and inherits that computed result into
+     every descendant, and a themed SUBTREE keeps the root's colour. */
+  --ets-code-bg: var(--nd-ink-100);
+  --ets-hint-text: var(--nd-ink-600);
+  --ets-error-text: #9b1f2c;
+}
+
+/* =============================================================================
+   3. SEMANTIC — DARK
+   =============================================================================
+   Two dark selectors, deliberately:
+
+     [data-theme="dark"] — the SPAs. This is the contract.
+     .dark               — VitePress, which owns its own toggle and always
+                           writes a class. Not ours to change.
+
+   The selector is written TWICE, and that is not redundancy:
+
+     :root:where(…)  — specificity (0,1,0), matching `:root` exactly, so source
+                       order decides and dark (being later) wins on <html>.
+     :where(…)       — specificity (0,0,0), for any element BELOW the root, so
+                       a subtree can be themed independently of the document.
+
+   A single `:where([data-theme='dark'], …)` does NOT work: `:root` is (0,1,0)
+   while `:where()` contributes nothing, so the light block would beat the dark
+   block on <html> and the page would stay light with data-theme="dark" sitting
+   right there in the DOM.
+
+   Never split this file. One token definition, every surface. */
+:root:where([data-theme='dark'], .dark),
+:where([data-theme='dark'], .dark) {
+  /* — Surfaces — */
+  --bg-app: var(--nd-ink-950);
+  --bg-surface: var(--nd-ink-900);
+  --bg-surface-2: var(--nd-ink-850);
+  --bg-surface-3: var(--nd-ink-800);
+  --bg-header: var(--nd-ink-900);
+  --bg-overlay: rgb(0 0 0 / 60%);
+  --bg-editable: #1f1a38;
+  --bg-editable-hover: #2a2350;
+
+  /* — Lines — */
+  --border-subtle: var(--nd-ink-800);
+  --border-default: var(--nd-ink-750);
+  --border-strong: #3a4553;
+  --border-input: #3a4553;
+  --border-focus: var(--nd-violet-400);
+
+  /* — Foregrounds — against --bg-surface: primary 14:1, secondary 7.8:1,
+       muted 5.5:1, link 8.2:1. Faint is for placeholders and empty states. */
+  --fg-primary: #e6eaf0;
+  --fg-secondary: #a3aebc;
+  --fg-muted: #8591a0;
+  --fg-faint: #6b7685;
+  --fg-on-accent: var(--nd-ink-0);
+  --fg-link: var(--nd-violet-300);
+
+  /* — Accent — on a dark surface the tint is already dark, so `-ink` lightens
+       rather than darkens. */
+  --accent: var(--nd-violet-400);
+  --accent-strong: var(--nd-violet-300);
+  --accent-soft: #262040;
+  --accent-ink: var(--nd-violet-200);
+  --accent-bar: var(--nd-violet-400);
+
+  /* — Solid fills — the same violet-600 + white as light; it holds 4.8:1 and
+       still separates from the dark surfaces around it. */
+  --accent-fill: var(--nd-violet-600);
+  --neutral-fill: var(--nd-ink-400);
+  --neutral-on: var(--nd-ink-950);
+
+  /* — Status — */
+  --success: var(--nd-green-300);
+  --success-soft: #12301f;
+  --success-ink: var(--nd-green-300);
+  --success-fill: var(--nd-green-300);
+  --success-on: #05160d;
+
+  --warning: var(--nd-amber-300);
+  --warning-soft: #44391a;
+  --warning-ink: var(--nd-amber-300);
+  --warning-fill: var(--nd-amber-300);
+  --warning-on: #1f1804;
+
+  --error: var(--nd-red-400);
+  --error-soft: #4d1d22;
+  --error-ink: #ff9ea6;
+  --error-fill: var(--nd-red-400);
+  --error-on: #22070a;
+
+  --info: var(--nd-blue-400);
+  --info-soft: #12324f;
+  --info-ink: var(--nd-blue-300);
+  --info-fill: var(--nd-blue-400);
+  --info-on: #04121f;
+
+  /* — Trading direction — */
+  --buy: var(--nd-blue-400);
+  --buy-soft: #12324f;
+  --buy-ink: var(--nd-blue-300);
+  --sell: var(--nd-orange-400);
+  --sell-soft: #4a2a12;
+  --sell-ink: var(--nd-orange-300);
+  --gain: var(--nd-blue-400);
+  --loss: var(--nd-orange-400);
+
+  /* — Elevation —
+     Dark surfaces swallow the light-mode shadows entirely, so these are deeper
+     and more opaque rather than a tinted copy. */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 2px 6px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 12px 28px rgb(0 0 0 / 55%);
+  --shadow-panel: 0 1px 3px rgb(0 0 0 / 40%);
+  --shadow-modal: 0 24px 48px -12px rgb(0 0 0 / 70%);
+
+  /* — Scrollbars — */
+  --scrollbar-track: color-mix(in srgb, var(--nd-ink-850) 45%, transparent);
+  --scrollbar-thumb: color-mix(in srgb, #3a4553 80%, var(--nd-violet-400));
+  --scrollbar-thumb-hover: color-mix(in srgb, #4a5566 45%, var(--nd-violet-400));
+  --scrollbar-thumb-active: var(--nd-violet-400);
+
+  --blade-scrim: rgb(0 0 0 / 60%);
+
+  /* — Legacy retail tokens — see the note in the light block for why these are
+       restated here rather than aliasing the semantic tokens. — */
+  --ets-code-bg: var(--nd-ink-800);
+  --ets-hint-text: #8591a0;
+  --ets-error-text: #ff9ea6;
+}
+
+/* =============================================================================
+   4. SCALES — theme-invariant
+   ============================================================================= */
+:root {
+  /* — Type families —
+     IBM Plex Sans for interface, headings and data; IBM Plex Mono for deal
+     references, codes and editors. Plex Sans has true tabular figures, so a
+     column of prices lines up under `tabular-nums` without going monospace.
+     Faces are self-hosted; see ./fonts.css. */
+  --font-display: 'IBM Plex Sans Variable', 'Segoe UI', 'Helvetica Neue', arial, sans-serif;
+  --font-ui: 'IBM Plex Sans Variable', 'Segoe UI', 'Helvetica Neue', arial, sans-serif;
+  --font-data: 'IBM Plex Sans Variable', 'Segoe UI', 'Helvetica Neue', arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', menlo, consolas, monospace;
+
+  /* — Type scale —
+     Deliberately dense. These are desk tools sitting on a lot of tabular
+     data, so the base is 13px, not the 16px a content site would take. */
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 18px;
+  --fs-2xl: 22px;
+  --fs-3xl: 28px;
+  --fs-4xl: 36px;
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-base: 1.5;
+  --lh-loose: 1.7;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --tr-tight: -0.01em;
+  --tr-normal: 0;
+  --tr-wide: 0.04em;
+  --tr-caps: 0.08em;
+
+  /* — Spacing — 4px base grid — */
+  --sp-0: 0;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* — Scrollbar geometry (colours are theme tokens above) — */
+  --scrollbar-size: 10px;
+
+  /* — Radius —
+     Squared-off throughout. `--r-md` at 4px is the default for controls and
+     cards. */
+  --r-none: 0;
+  --r-xs: 2px;
+  --r-sm: 3px;
+  --r-md: 4px;
+  --r-lg: 6px;
+  --r-pill: 999px;
+
+  /* — Motion — */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* — Blade stack panel widths —
+     Consumed by @ets/ui's blade components via `size="sm|md|lg|xl|fill"`.
+     `fill` flexes into the remaining width, floored at --blade-lg and capped at
+     --blade-fill-max so a single wide panel cannot stretch to an unreadable
+     line length on a large monitor. The same steps are also the floor a blade
+     can name explicitly with `min-size`. */
+  --blade-sm: 20rem;
+  --blade-md: 30rem;
+  --blade-lg: 42rem;
+  --blade-xl: 56rem;
+  --blade-fill-max: 90rem;
+}

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- xUnit v3, Shouldly and the test SDK come from tests/Directory.Build.props. -->
+
+    <PropertyGroup>
+        <RootNamespace>EtsArchitectureTests</RootNamespace>
+        <AssemblyName>EtsArchitectureTests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- ArchUnitNET with its xUnit v3 integration (rule.Check(architecture) throws a v3 assertion failure). -->
+        <PackageReference Include="TngTech.ArchUnitNET.xUnitV3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+    <!-- References every layer directly rather than going through a host. Referencing the host would pull
+         the whole graph in transitively and hide a project that had lost a reference it needs. Adding a
+         module means adding its five projects here and an entry in Abstractions/EtsModules.cs. -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\core\Ets.Core.Domain\Ets.Core.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\src\core\Ets.Core.Application\Ets.Core.Application.csproj"/>
+        <ProjectReference Include="..\..\..\src\core\Ets.Core.Infrastructure\Ets.Core.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\..\src\core\Ets.Core.Presentation\Ets.Core.Presentation.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.Domain\Ets.Modules.Deals.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.Application\Ets.Modules.Deals.Application.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.Infrastructure\Ets.Modules.Deals.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.IntegrationEvents\Ets.Modules.Deals.IntegrationEvents.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.Presentation\Ets.Modules.Deals.Presentation.csproj"/>
+        <!-- The host, for HostDependencyTests only: the layer rules range over core and module assemblies. -->
+        <ProjectReference Include="..\..\..\src\hosts\Ets.Servers.Api\Ets.Servers.Api.csproj"/>
+    </ItemGroup>
+
+</Project>

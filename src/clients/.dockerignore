@@ -1,0 +1,8 @@
+# Applies when the Docker build context is src/clients (the docs image).
+# The repository-root .dockerignore does NOT apply to a non-root context, so
+# these patterns have to be repeated here.
+**/node_modules/
+**/dist/
+**/.vitepress/cache/
+**/.vitepress/dist/
+**/coverage/

@@ -1,0 +1,39 @@
+/* Stanwell brand faces — self-hosted.
+ *
+ * Deliberately NOT a Google Fonts `@import url(https://fonts.googleapis.com/…)`,
+ * which is how the design-system source ships them. Three reasons: a blocked
+ * corporate network silently degrades every app to Arial with no error; it is a
+ * third-party request per user on an internal tool; and it makes the apps
+ * unusable offline. The faces come from @fontsource instead, so they are
+ * ordinary dependencies that Vite fingerprints and serves from our own origin.
+ *
+ * Imported separately from tokens.css because the two have different consumers:
+ * every surface wants the tokens, but only the SPAs want to pay for font bytes.
+ *
+ * Each face declares `unicode-range`, so a browser downloads only the subsets a
+ * page actually renders — importing the full-subset files below costs nothing
+ * extra in practice, and means a customer name with a diacritic still renders
+ * in brand rather than falling back mid-word.
+ *
+ * Family names are NOT the plain family: @fontsource's variable builds register
+ * as "<Family> Variable". tokens.css's --font-* stacks match these exactly —
+ * change one, change the other.
+ */
+
+/* Titillium Web — headings and top-level navigation.
+   Static weights only; there is no variable build of this face. Four weights,
+   matching the sign-off pack's usage. */
+@import '@fontsource/titillium-web/300.css';
+@import '@fontsource/titillium-web/400.css';
+@import '@fontsource/titillium-web/600.css';
+@import '@fontsource/titillium-web/700.css';
+
+/* Outfit — UI labels and second-tier navigation. Variable (100–900). */
+@import '@fontsource-variable/outfit/index.css';
+
+/* Roboto — data, tables, body. Variable weight axis only; the width axis and
+   italics are unused and deliberately not imported. */
+@import '@fontsource-variable/roboto/wght.css';
+
+/* JetBrains Mono — code, IDs, JSON editors. Variable weight axis. */
+@import '@fontsource-variable/jetbrains-mono/wght.css';

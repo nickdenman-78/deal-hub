@@ -1,0 +1,34 @@
+{
+  "name": "@ets/app-ui-showcase",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dev harness for @ets/ui. Renders every component in light and dark. Not deployed.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "preview": "vite preview",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@ets/brand": "workspace:*",
+    "@ets/editor": "workspace:*",
+    "@ets/ui": "workspace:*",
+    "@vuetify/v0": "catalog:",
+    "@iconify/vue": "catalog:",
+    "monaco-editor": "catalog:",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@ets/eslint-config": "workspace:*",
+    "@ets/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vue-tsc": "catalog:"
+  }
+}

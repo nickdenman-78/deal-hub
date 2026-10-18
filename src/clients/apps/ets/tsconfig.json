@@ -1,0 +1,12 @@
+{
+  "extends": "@ets/tsconfig/vue-app.json",
+  "compilerOptions": {
+    // App-local: the "@" alias must match the resolve.alias in vite.config.ts,
+    // so it stays with the app rather than in the shared base.
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "src/**/*.tsx"]
+}

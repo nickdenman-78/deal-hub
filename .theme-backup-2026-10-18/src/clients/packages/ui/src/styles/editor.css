@@ -1,0 +1,354 @@
+/*
+ * Stanwell skin for `@ets/editor` class hooks.
+ *
+ * The editor package ships structural CSS only (layout, sizing, class names).
+ * Import this AFTER `@ets/ui/styles/theme.css` so brand tokens resolve.
+ * Install `createEtsEditorPlugin()` so Monaco themes and chrome components
+ * match the SPA.
+ */
+
+/* ── Monaco hosts ─────────────────────────────────────────────────────────── */
+
+.r-diff-viewer,
+.r-json-editor,
+.r-markdown-editor,
+.r-merge-editor__host {
+  border: 1px solid var(--border-default);
+}
+
+.r-markdown-editor {
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+}
+
+/* ── Merge editor ─────────────────────────────────────────────────────────── */
+
+.r-merge-editor__header {
+  border: 1px solid var(--border-default);
+  border-bottom: none;
+}
+
+.r-merge-editor__header--theirs {
+  background: var(--warning-soft);
+  color: var(--warning-ink);
+}
+
+.r-merge-editor__header--mine {
+  background: var(--success-soft);
+  color: var(--success-ink);
+}
+
+.r-merge-editor__header--result {
+  background: var(--bg-surface-3);
+  color: var(--fg-primary);
+}
+
+.r-merge-editor__warn {
+  background: var(--error-soft);
+  color: var(--error-ink);
+}
+
+/*
+ * Un-scoped conflict decorations: Monaco injects these into its own DOM tree,
+ * which scoped CSS cannot reach. Class names are constructed in MergeEditor —
+ * renaming one side only would leave regions unstyled with nothing in the
+ * console to say so.
+ */
+.r-merge-conflict-region {
+  background-color: color-mix(in srgb, var(--warning) 12%, transparent);
+}
+
+.r-merge-conflict-theirs {
+  border-left: 3px solid var(--warning);
+}
+
+.r-merge-conflict-mine {
+  border-left: 3px solid var(--success);
+}
+
+.r-merge-accept-widget {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.15rem 0.3rem;
+  z-index: 5;
+}
+
+.r-merge-btn {
+  font-size: 0.7rem;
+  font-family: inherit;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.r-merge-btn:hover {
+  background: var(--bg-surface-3);
+}
+
+.r-merge-btn--primary {
+  border-color: var(--border-focus);
+  color: var(--accent-ink);
+}
+
+.r-merge-btn--primary:hover {
+  background: var(--accent-soft);
+}
+
+/* ── Markdown toolbar ─────────────────────────────────────────────────────── */
+
+.r-md-toolbar--bar {
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface-2, var(--bg-surface));
+}
+
+.r-md-toolbar--floating {
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-md, 0 4px 12px rgb(0 0 0 / 18%));
+}
+
+.r-md-toolbar__sep {
+  background: var(--border-default);
+}
+
+.r-md-toolbar__tool {
+  border-radius: var(--r-xs);
+  color: var(--fg-secondary);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.r-md-toolbar__tool:hover:not(:disabled) {
+  background: var(--bg-surface-3);
+  color: var(--fg-primary);
+}
+
+.r-md-toolbar__tool:disabled {
+  color: var(--fg-faint);
+}
+
+.r-md-toolbar__tool[aria-pressed='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+/* Match Input's ring. Floating menus mount on <body>, so they do not inherit
+   the frame's :focus-within treatment — without this, Tabbing into a tool gets
+   base.css's exterior ring. */
+.r-md-toolbar__tool:focus-visible {
+  outline: 1px solid var(--border-focus);
+  outline-offset: -1px;
+}
+
+/* ── SimpleMarkdownEditor field chrome ────────────────────────────────────── */
+
+.r-md-editor__frame {
+  border: 1px solid var(--border-input);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.r-md-editor__frame:focus-within {
+  /* Border colour alone — the 1px ring. No outline/box-shadow: those have
+     interacted with this frame's `overflow: hidden` and the contenteditable
+     scrollport to change measure on focus (height jump when nearly full). */
+  border-color: var(--border-focus);
+  outline: none;
+}
+
+/* ProseMirror is the real focus target. Kill every ring here so only the
+   frame border signals focus — an interior outline (even clipped) has been
+   enough to nudge wrap/scrollHeight when the field is nearly full. */
+.r-md-editor__surface:focus,
+.r-md-editor__surface:focus-visible,
+.r-md-editor__surface.ProseMirror-focused {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none;
+}
+
+.r-field--readonly .r-md-editor__frame {
+  background: var(--bg-surface-2);
+}
+
+.r-field--disabled .r-md-editor__frame {
+  background: var(--bg-surface-3);
+  opacity: 0.7;
+}
+
+.r-md-editor__floating {
+  z-index: var(--z-popover, 60);
+}
+
+.r-md-editor__surface {
+  padding: var(--sp-3);
+  color: var(--fg-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal, 1.5);
+}
+
+.r-md-editor__surface p.is-editor-empty:first-child::before {
+  color: var(--fg-faint);
+}
+
+.r-md-editor__surface h1,
+.r-md-editor__surface h2,
+.r-md-editor__surface h3 {
+  margin: var(--sp-4) 0 var(--sp-2);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+}
+
+.r-md-editor__surface h1 {
+  font-size: var(--fs-lg);
+}
+
+.r-md-editor__surface h2 {
+  font-size: var(--fs-md);
+}
+
+.r-md-editor__surface h3 {
+  font-size: var(--fs-base);
+}
+
+.r-md-editor__surface p {
+  margin: 0 0 var(--sp-2);
+}
+
+.r-md-editor__surface ul,
+.r-md-editor__surface ol {
+  margin: 0 0 var(--sp-2);
+  padding-left: var(--sp-5);
+}
+
+.r-md-editor__surface blockquote {
+  margin: 0 0 var(--sp-2);
+  padding-left: var(--sp-3);
+  border-left: 3px solid var(--border-default);
+  color: var(--fg-muted);
+}
+
+.r-md-editor__surface code {
+  padding: 0.1em 0.3em;
+  border-radius: var(--r-xs);
+  background: var(--bg-surface-3);
+  font-family: var(--font-mono, var(--font-data));
+  font-size: 0.9em;
+}
+
+.r-md-editor__surface pre {
+  margin: 0 0 var(--sp-2);
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  background: var(--bg-surface-3);
+  overflow-x: auto;
+}
+
+.r-md-editor__surface pre code {
+  padding: 0;
+  background: none;
+}
+
+.r-md-editor__surface a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+}
+
+.r-md-editor__surface hr {
+  margin: var(--sp-3) 0;
+  border: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.r-md-editor__count {
+  border-top: 1px solid var(--border-default);
+  color: var(--fg-muted);
+  font-size: var(--fs-xs);
+}
+
+.r-md-editor__count.is-over {
+  color: var(--error-ink);
+}
+
+.r-md-editor__words {
+  color: var(--fg-faint);
+}
+
+/* ── MarkdownView / MarkdownExcerpt ───────────────────────────────────────── */
+
+.r-md-view {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--fg-primary);
+}
+
+.r-md-view :is(h1) {
+  font-size: 1.15rem;
+}
+
+.r-md-view :is(h2) {
+  font-size: 1.05rem;
+}
+
+.r-md-view :is(h3) {
+  font-size: 0.95rem;
+}
+
+.r-md-view :is(code) {
+  background: var(--ets-code-bg, var(--bg-surface-3));
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  font-family: var(--font-mono, var(--font-data), Consolas, monospace);
+  font-size: 0.85em;
+}
+
+.r-md-view :is(pre) {
+  background: var(--fg-primary);
+  color: var(--bg-surface);
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.r-md-view :is(pre code) {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.r-md-view :is(a) {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.r-md-view :is(th),
+.r-md-view :is(td) {
+  border: 1px solid var(--border-default);
+  padding: 0.3rem 0.5rem;
+}
+
+.r-md-view :is(blockquote) {
+  border-left: 3px solid var(--border-strong);
+  color: var(--fg-muted);
+}
+
+.r-md-excerpt {
+  margin: var(--sp-1) 0 0 0;
+  color: var(--fg-muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+
+/* ── Link dialog form spacing when skinned ────────────────────────────────── */
+
+.r-md-link {
+  gap: var(--sp-3);
+}

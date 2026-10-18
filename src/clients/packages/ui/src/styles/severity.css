@@ -1,0 +1,58 @@
+/* Shared severity colour roles. Each class sets five custom properties;
+ * Button / Tag / Badge / ProgressBar consume them so a new severity is one
+ * block rather than a rule per component.
+ *
+ *   --sev-hue  plain hue (borders, icons — nothing sits on top of it)
+ *   --sev-fill solid background for text-on-hue (basic / raised / solid)
+ *   --sev-on   text ON --sev-fill
+ *   --sev-ink  text ON --sev-soft (and on monochrome chrome)
+ *   --sev-soft tinted background (text-variant hover, soft tags)
+ */
+
+.r-severity-primary {
+  --sev-hue: var(--accent);
+  --sev-fill: var(--accent-fill);
+  --sev-on: var(--fg-on-accent);
+  --sev-ink: var(--accent-ink);
+  --sev-soft: var(--accent-soft);
+}
+
+.r-severity-secondary {
+  --sev-hue: var(--border-strong);
+  --sev-fill: var(--neutral-fill);
+  --sev-on: var(--neutral-on);
+  --sev-ink: var(--fg-secondary);
+  --sev-soft: var(--bg-surface-3);
+}
+
+.r-severity-success {
+  --sev-hue: var(--success);
+  --sev-fill: var(--success-fill);
+  --sev-on: var(--success-on);
+  --sev-ink: var(--success-ink);
+  --sev-soft: var(--success-soft);
+}
+
+.r-severity-info {
+  --sev-hue: var(--info);
+  --sev-fill: var(--info-fill);
+  --sev-on: var(--info-on);
+  --sev-ink: var(--info-ink);
+  --sev-soft: var(--info-soft);
+}
+
+.r-severity-warning {
+  --sev-hue: var(--warning);
+  --sev-fill: var(--warning-fill);
+  --sev-on: var(--warning-on);
+  --sev-ink: var(--warning-ink);
+  --sev-soft: var(--warning-soft);
+}
+
+.r-severity-error {
+  --sev-hue: var(--error);
+  --sev-fill: var(--error-fill);
+  --sev-on: var(--error-on);
+  --sev-ink: var(--error-ink);
+  --sev-soft: var(--error-soft);
+}

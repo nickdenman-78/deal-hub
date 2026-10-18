@@ -1,0 +1,27 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+artifacts/
+TestResults/
+*.trx
+coverage*.xml
+
+# IDEs
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+
+# Local secrets and environment
+*.env
+appsettings.*.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontends (src/clients)
+node_modules/
+dist/
+.env.local

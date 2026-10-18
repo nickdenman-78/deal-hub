@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Cross-cutting infrastructure shared by two or more modules: the EF Core context base and conventions, the request's caller, permission policies and the Guid v7 id generator.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Ets.Core.Application\Ets.Core.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

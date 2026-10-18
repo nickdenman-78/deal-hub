@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <RootNamespace>Ets.Servers.Api</RootNamespace>
+        <AssemblyName>Ets.Servers.Api</AssemblyName>
+        <UserSecretsId>ets-servers-api</UserSecretsId>
+        <Description>ETS API host: the modular-monolith composition root and the only HTTP entry point.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+        <PackageReference Include="Scalar.AspNetCore"/>
+        <PackageReference Include="Serilog.AspNetCore"/>
+        <PackageReference Include="Serilog.Sinks.Seq"/>
+    </ItemGroup>
+
+    <!-- Per module the host references Infrastructure (service-side composition root), Presentation (route-side
+         composition root) and IntegrationEvents (the module's public API, where its permission catalogue
+         lives). It deliberately does NOT reference a module's Application or Domain (ADR-0001, ADR-0003). -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\aspire\Ets.Aspire.ServiceDefaults\Ets.Aspire.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\core\Ets.Core.Application\Ets.Core.Application.csproj"/>
+        <ProjectReference Include="..\..\core\Ets.Core.Infrastructure\Ets.Core.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\core\Ets.Core.Presentation\Ets.Core.Presentation.csproj"/>
+        <ProjectReference Include="..\..\modules\deals\Ets.Modules.Deals.Infrastructure\Ets.Modules.Deals.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\modules\deals\Ets.Modules.Deals.IntegrationEvents\Ets.Modules.Deals.IntegrationEvents.csproj"/>
+        <ProjectReference Include="..\..\modules\deals\Ets.Modules.Deals.Presentation\Ets.Modules.Deals.Presentation.csproj"/>
+    </ItemGroup>
+
+</Project>

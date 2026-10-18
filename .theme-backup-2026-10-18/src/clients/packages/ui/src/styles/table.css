@@ -1,0 +1,404 @@
+/* ============================================================
+   Data table
+   ============================================================
+   Dense by default — these are operator tools sitting on a lot of tabular
+   data, and the type scale is 13px base for the same reason.
+   ============================================================ */
+
+.r-table-wrap {
+  /* min-width: 0 lets a flex parent shrink this without forcing page overflow. */
+  min-width: 0;
+  width: 100%;
+  /*
+   * Deliberately NO overflow here. `overflow: auto` (even x-only — browsers
+   * force the other axis) makes this wrap the sticky containing block. Unless
+   * the wrap itself is height-bounded and is the element that scrolls, sticky
+   * headers never detach. Callers that fill a panel (list body, blade, …)
+   * scroll that panel; wide tables scroll with it on the same axis.
+   */
+}
+
+.r-table {
+  width: 100%;
+  border-collapse: separate;
+  /* `separate` with zero spacing, not `collapse`: collapsed borders cannot be
+     overridden per-cell, which breaks the group subheader's full-width rule and
+     makes a sticky header lose its bottom border when it detaches. */
+  border-spacing: 0;
+  color: var(--fg-primary);
+  font-family: var(--font-data);
+  font-size: var(--fs-base);
+  line-height: var(--lh-snug);
+  /* A column of amounts is unreadable in proportional digits. */
+  font-variant-numeric: tabular-nums;
+  /*
+   * Pitch of an sm icon button (`.r-btn--sm` is 28px). Compact header and body
+   * rows share this so a text-only header is not shorter than a button row,
+   * and first/last placeholder slots can match a real control.
+   */
+  --r-table-row-control: 28px;
+  /*
+   * Sticky offsets for stacked thead rows and group subheaders.
+   * Filter starts at 0 unless `.r-table--has-filters`. DataTable measures the
+   * live filter/header rows and overrides these vars so sticky `top`s seal —
+   * a CSS-only approx left a gap where body rows showed through on scroll.
+   */
+  --r-table-filter-height: 0px;
+  --r-table-head-height: calc(var(--sp-2) * 2 + 1.35em);
+}
+
+.r-table--has-filters {
+  /* Fallback until ResizeObserver publishes the measured height. */
+  --r-table-filter-height: calc(var(--sp-1) * 2 + 2.25rem);
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+
+.r-table thead th {
+  position: sticky;
+  z-index: 2;
+  /* Sit under a sticky filter row when one is present; otherwise 0. */
+  top: var(--r-table-filter-height);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border-default);
+  /* Opaque so rows do not show through while stuck. */
+  background: var(--bg-surface);
+  color: var(--fg-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-align: start;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ── Filters (sticky bar above headers) ──────────────────── */
+
+/*
+ * Must beat `.r-table thead th` (0,1,2) — a lone `.r-table__filters th`
+ * loses on `top`/`z-index`/`padding`, so both rows stuck at the same offset
+ * and the opaque header cells covered the controls.
+ */
+.r-table thead .r-table__filters th {
+  z-index: 3;
+  top: 0;
+  padding: var(--sp-2);
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: var(--fw-regular);
+  white-space: normal;
+  vertical-align: middle;
+}
+
+/*
+ * Free-form strip — controls do NOT align to columns. Callers compose any
+ * mix of fields; the bar wraps rather than forcing a grid.
+ */
+.r-table__filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.r-table thead .r-table__filters .r-field {
+  position: relative;
+  flex: 0 1 10rem;
+  min-width: 8rem;
+  width: auto;
+  max-width: 16rem;
+}
+
+.r-table thead .r-table__filters .r-multiselect {
+  /* Chips need room; don't squeeze MultiSelect into an 8rem box. */
+  flex: 1 1 14rem;
+  min-width: 12rem;
+  max-width: 22rem;
+}
+
+/*
+ * DateRangePicker roots as `.r-field.r-daterange` and nests two more
+ * `.r-field` pickers. Without an exception it inherits the bar's 16rem cap,
+ * and each nested picker also gets that rule — the pair wraps to a stack.
+ */
+.r-table thead .r-table__filters .r-daterange {
+  flex: 1 1 22rem;
+  min-width: 20rem;
+  max-width: 32rem;
+}
+
+.r-table thead .r-table__filters .r-daterange .r-field {
+  flex: 1 1 11rem;
+  min-width: 0;
+  max-width: none;
+  width: auto;
+}
+
+.r-table thead .r-table__filters .r-daterange .r-daterange__row {
+  flex-wrap: nowrap;
+}
+
+.r-table thead .r-table__filters .r-check {
+  flex: none;
+  min-width: 0;
+}
+
+/*
+ * Field labels in the filter bar are visually omitted by default — pass
+ * `label` anyway for a11y / clear copy; placeholders carry the cue. Opt in
+ * with `showFilterLabels`. Checkbox labels stay visible either way.
+ */
+.r-table thead .r-table__filters:not(.r-table__filters--show-labels) .r-field__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.r-table thead .r-table__filters--show-labels .r-table__filters-bar {
+  align-items: flex-end;
+}
+
+.r-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.r-table__sort:hover {
+  color: var(--fg-primary);
+}
+
+/* The sort glyph is a hint until the column is actually sorted, so an unsorted
+   column does not shout as loudly as the one doing the sorting. */
+.r-table th[aria-sort='none'] .r-table__sort .r-icon {
+  opacity: 0.35;
+}
+
+.r-table th[aria-sort='ascending'] .r-table__sort,
+.r-table th[aria-sort='descending'] .r-table__sort {
+  color: var(--accent-ink);
+}
+
+/* ── Body ────────────────────────────────────────────────── */
+
+.r-table tbody td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border-subtle);
+  /* Middle, not top: rows mix 13px text with sm icon buttons. Top alignment
+     leaves the text hanging off the top of the button's box. */
+  vertical-align: middle;
+}
+
+.r-table--compact tbody td,
+.r-table--compact thead tr:not(.r-table__filters) th {
+  padding: var(--sp-1) var(--sp-2);
+  /*
+   * Height on a table cell is a minimum — wrapping content still grows the
+   * row. The extra 1px is the cell's border-bottom, included because
+   * `box-sizing: border-box` is global; without it the header (text only)
+   * measures 1px shorter than a body row that has to fit a 28px button.
+   */
+  height: calc(var(--r-table-row-control) + var(--sp-1) * 2 + 1px);
+}
+
+.r-table--compact {
+  --r-table-head-height: calc(var(--r-table-row-control) + var(--sp-1) * 2 + 1px);
+}
+
+.r-table--compact.r-table--has-filters {
+  --r-table-filter-height: calc(var(--sp-1) * 2 + 1.75rem);
+}
+
+/* `standard` is the base padding above — class kept so density toggles stay uniform. */
+
+.r-table--comfortable tbody td {
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.r-table--comfortable thead th {
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.r-table--comfortable {
+  --r-table-head-height: calc(var(--sp-3) * 2 + 1.35em);
+}
+
+.r-table--comfortable.r-table--has-filters {
+  --r-table-filter-height: calc(var(--sp-3) * 2 + 1.75rem);
+}
+
+.r-table--striped tbody tr:nth-child(even of :not(.r-table__group-header)) td {
+  background: var(--bg-surface-2);
+}
+
+.r-table .is-start {
+  text-align: start;
+}
+
+.r-table .is-center {
+  text-align: center;
+}
+
+.r-table .is-end {
+  text-align: end;
+}
+
+/* ── Activatable rows ────────────────────────────────────── */
+
+.r-table--activatable tbody tr[data-row] {
+  cursor: pointer;
+}
+
+.r-table--activatable tbody tr[data-row]:hover td {
+  background: var(--bg-surface-3);
+}
+
+/* The open record stays lit while you work in the panel it opened. That
+   highlight is the only thing tying a deep blade back to the row it came from,
+   so it is not decoration — and it must beat the striping above, hence the
+   heavier selector. */
+.r-table tbody tr[data-row].is-active td,
+.r-table--striped tbody tr[data-row].is-active td {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.r-table tbody tr[data-row].is-active td:first-child {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* The row is the focus target, not a cell, so the ring goes round the whole
+   row. Negative offset keeps it inside the row box rather than bleeding over
+   the rows above and below. */
+.r-table tbody tr[data-row]:focus-visible {
+  outline: 1px solid var(--border-focus);
+  outline-offset: -1px;
+}
+
+/* ── Group subheaders ────────────────────────────────────── */
+
+.r-table__group-header th {
+  position: sticky;
+  z-index: 1;
+  /* Sit under sticky filter + column header rows (measured vars), not over them. */
+  top: calc(var(--r-table-filter-height) + var(--r-table-head-height));
+  padding: 0;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface-3);
+  text-align: start;
+}
+
+/* In-table empty/loading when a filter row must stay mounted. */
+.r-table__state-row td {
+  padding: var(--sp-8) var(--sp-4);
+  border-bottom: 0;
+  color: var(--fg-muted);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.r-table__group-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  background: none;
+  color: var(--fg-secondary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-align: start;
+  cursor: pointer;
+}
+
+.r-table__group-toggle:hover {
+  color: var(--fg-primary);
+}
+
+.r-table__group-count {
+  margin-inline-start: auto;
+  padding: 0 var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--bg-surface);
+  color: var(--fg-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-regular);
+}
+
+/* ── Selection / expansion control columns ───────────────── */
+
+.r-table__col-control {
+  width: 2.25rem;
+}
+
+.r-table__control-head,
+.r-table__control-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* The native checkbox, tinted to the theme. accent-color covers the tick and
+   the indeterminate dash in every engine that has the control at all. */
+.r-table__checkbox {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent-fill);
+  cursor: pointer;
+}
+
+tr.is-selected > td {
+  background: var(--accent-soft);
+}
+
+.r-table__expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: none;
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+
+.r-table__expand:hover {
+  background: var(--bg-surface-2);
+  color: var(--fg-primary);
+}
+
+/* The disclosure row reads as part of its parent: inset surface, no hover. */
+.r-table__expansion > td {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-surface-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ── Loading / empty ─────────────────────────────────────── */
+
+.r-table__state {
+  padding: var(--sp-8) var(--sp-4);
+  color: var(--fg-muted);
+  font-family: var(--font-ui);
+  font-size: var(--fs-sm);
+  text-align: center;
+}

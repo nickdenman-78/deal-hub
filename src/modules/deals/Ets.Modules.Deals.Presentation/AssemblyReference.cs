@@ -1,0 +1,11 @@
+using System.Reflection;
+
+namespace Ets.Modules.Deals.Presentation;
+
+/// <summary>
+///     Stable handle on this assembly for DI scanning and architecture tests.
+/// </summary>
+public static class AssemblyReference
+{
+    public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
+}
