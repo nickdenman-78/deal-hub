@@ -44,6 +44,12 @@ in the shared kernel. Distinct from `Money` (plain dollars) and `Price` (always 
 
 - **A deal's id is assigned by its first event.** A deal's captured event (e.g. `AsxFuturesDealCaptured`) is
   always the first event of its stream; the id comes from `IIdGenerator`, never from the store (ADR-0014).
+- **ASX futures prices and volumes are checked unrounded.** `Amount` and `Volume` round `Value` to four
+  decimals, so `AsxFuturesDeal.Capture` checks the $0.01/MWh tick and whole lots against `RawValue`; otherwise
+  95.505 would pass as a price.
+- **A product code's term is derived, never entered.** `ProductCode.Create` decodes `BNH26` to `Q126` and a
+  strip's Z or M expiry to the following `Cal` or `Fin` year (`HNZ26` is `Cal27`), so a deal's term cannot
+  disagree with its code.
 
 Rules every change must preserve, grouped by module. State each as a rule and its reason.
 
@@ -77,9 +83,10 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
 - **The local Keycloak realm is a starter.** `Realms/ets-realm.json` declares the `ets-api` audience client, a
   public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user — local only. The Users
   module will provision real users.
-- **The Deals domain has no aggregate.** `DealId` and `DealName` exist, but the `ExchangeDeal` aggregate and
-  its `AsxFuturesDeal` subtype are modelled in `deals.cml` only; there is no aggregate, event, command,
-  handler or endpoint for them in code.
+- **ASX futures deals have a domain but no use case.** The `ExchangeDeal` aggregate, its `AsxFuturesDeal`
+  subtype, their value objects and `AsxFuturesDealCaptured` exist in `Ets.Modules.Deals.Domain`, but
+  `CaptureAsxFuturesDeal` has no command, handler, validator or endpoint, and nothing implements
+  `IAsxProductCatalogue`.
 - **Deals has no persistence adapter.** No Marten store (`IDealsStore`), unit of work or
   `IDealReferenceGenerator` is registered by `AddDealsModule`.
 - **Permission claims are not populated.** `AddCoreAuthorization` declares one policy per permission and
@@ -115,3 +122,9 @@ Places where documents, model and code use different names for the same thing, a
   convention is `Result.Failure(DomainError.*)`.
 - **`DateValue`, `TimeRange` and `EmailAddress` differ in shape from the CML.** `DateValue.TimePart` is a
   `TimeOnly` and `TimeZoneInfo` a `TimeZoneInfo` (CML: `String`); `EmailAddress.IsValid` means "not empty".
+- **`FuturesPayoff.strike` is nullable in code.** The CML has `Decimal strike`; the C# `Strike` is `decimal?`,
+  `null` for standard futures, which have no strike.
+- **`AsxFuturesDealCaptured.occurredAt` is a `DateTimeOffset`.** The CML has `DateTime`; `IDomainEvent` wins.
+- **`AsxProductCatalogue` is the async port `IAsxProductCatalogue`.** Its lookup is I/O, so
+  `FindListedProductAsync` returns `Task<Result<AsxProduct>>` where the CML returns `AsxProduct`.
+- **Base load's `TimeRange` ends at `TimeOnly.MaxValue`.** The CML says 00:00-24:00; 24:00 is not a `TimeOnly`.
