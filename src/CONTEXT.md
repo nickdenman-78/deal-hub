@@ -27,10 +27,6 @@ and name (`Apr26`, `Q126`, `JJ26`, `Cal26`, `Fin22/23`, `Feb26-May26`) are deriv
 A dollar value with an explicit `AmountUnit` (`c/kWh`, `$/MWh`, `c/kW`, `$/MW`, or none for plain dollars),
 in the shared kernel. Distinct from `Money` (plain dollars) and `Price` (always $/MWh).
 
-### Retail deal
-The only deal aggregate modelled so far (`Ets.Modules.Deals.Domain.Models.RetailDeal`), event sourced, created
-by `RetailDeal.Capture`. Its id is `DealId`.
-
 ## Invariants
 
 ### Shared kernel
@@ -46,8 +42,8 @@ by `RetailDeal.Capture`. Its id is `DealId`.
 
 ### Deals
 
-- **A retail deal's id is assigned by its first event.** `RetailDealCaptured` is always the first event of
-  the stream; the id comes from `IIdGenerator`, never from the store (ADR-0014).
+- **A deal's id is assigned by its first event.** A deal's captured event (e.g. `AsxFuturesDealCaptured`) is
+  always the first event of its stream; the id comes from `IIdGenerator`, never from the store (ADR-0014).
 
 Rules every change must preserve, grouped by module. State each as a rule and its reason.
 
@@ -81,9 +77,9 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
 - **The local Keycloak realm is a starter.** `Realms/ets-realm.json` declares the `ets-api` audience client, a
   public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user — local only. The Users
   module will provision real users.
-- **The Deals domain is the retail deal alone.** `RetailDeal` can be captured and rehydrated, and `DealName`
-  exists, but no deal carries a name, reference, product or lifecycle yet, and there is no command, handler
-  or endpoint for any of it.
+- **The Deals domain has no aggregate.** `DealId` and `DealName` exist, but the `ExchangeDeal` aggregate and
+  its `AsxFuturesDeal` subtype are modelled in `deals.cml` only; there is no aggregate, event, command,
+  handler or endpoint for them in code.
 - **Deals has no persistence adapter.** No Marten store (`IDealsStore`), unit of work or
   `IDealReferenceGenerator` is registered by `AddDealsModule`.
 - **Permission claims are not populated.** `AddCoreAuthorization` declares one policy per permission and
@@ -108,7 +104,7 @@ Places where documents, model and code use different names for the same thing, a
   there is no switch that disables authorization. ADR-0006 wins: `DealsAuthorizationPolicies` requires every
   policy name, and tests authenticate against a Keycloak container.
 - **`DealCaptureContext`'s CML module is not a namespace.** `deals.cml` groups its elements in
-  `Module DealCapture`, but the Deals domain keeps `Models/`, `ValueObjects/` and `Events/` at the project
+  `Module Deals`, but the Deals domain keeps `Models/`, `ValueObjects/` and `Events/` at the project
   root, because the architecture tests pin domain events to `Ets.Modules.Deals.Domain.Events`. The code wins
   until the tests change.
 - **`Address.address` is `StreetAddress` in code.** A C# member cannot share its type's name.

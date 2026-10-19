@@ -40,8 +40,9 @@ and legal identifiers (`EmailAddress`, `PhoneNumber`, `ABN`, `ACN`, `Address`), 
 
 ### DealCaptureContext (`deals/deals.cml`)
 
-Captures deals. Its one aggregate so far is `RetailDeal`, identified by a `DealId`; `DealName` is the
-trader-facing name. It shares the kernel (`[SK]<->[SK] SharedContext`). Implemented in `src/modules/deals/` (event sourced).
+Captures deals, all in its `Deals` module. Its one aggregate so far is `ExchangeDeal`, identified by a
+`DealId`, whose `AsxFuturesDeal` subtype captures ASX electricity futures from a product code, direction,
+price and volume (`AsxFuturesDealCaptured`); `DealName` is the trader-facing name. It shares the kernel (`[SK]<->[SK] SharedContext`). Implemented in `src/modules/deals/` (event sourced).
 
 ## Rendering
 
