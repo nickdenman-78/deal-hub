@@ -61,6 +61,8 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
     <!-- Validation & CQRS decoration -->
+    <PackageVersion Include="CronExpressionDescriptor" Version="2.45.0" />
+    <PackageVersion Include="Quartz" Version="4.3.0" />
     <PackageVersion Include="FluentValidation" Version="12.2.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />

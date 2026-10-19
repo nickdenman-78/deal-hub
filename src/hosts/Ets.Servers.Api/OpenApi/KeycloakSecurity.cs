@@ -114,6 +114,6 @@ internal static class KeycloakSecurity
     {
         string? authority = configuration[$"{KeycloakOptions.SectionName}:{nameof(KeycloakOptions.Authority)}"];
 
-        return Uri.TryCreate(authority, UriKind.Absolute, out _) ? authority!.TrimEnd('/') : null;
+        return Uri.TryCreate(authority, UriKind.Absolute, out _) ? authority.TrimEnd('/') : null;
     }
 }

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- xUnit v3, Shouldly and the test SDK come from tests/Directory.Build.props. -->
+
+    <PropertyGroup>
+        <RootNamespace>EtsCoreTests</RootNamespace>
+        <AssemblyName>EtsCoreTests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Shouldly"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\core\Ets.Core.Domain\Ets.Core.Domain.csproj"/>
+        <!-- For the Quartz cron schedule evaluator. -->
+        <ProjectReference Include="..\..\..\src\core\Ets.Core.Infrastructure\Ets.Core.Infrastructure.csproj"/>
+    </ItemGroup>
+
+</Project>

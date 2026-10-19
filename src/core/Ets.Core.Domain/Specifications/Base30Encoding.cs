@@ -149,7 +149,6 @@ public static class Base30Encoding
         }
 
         // Calculate required length to encode entropyBytes bytes in base30
-        // log(256^entropyBytes) / log(30) = entropyBytes * 8 * log(2) / log(30)
         int length = (int)Math.Ceiling(entropyBytes * 8 * Math.Log(2) / Math.Log(30));
 
         Span<byte> randomBytes = stackalloc byte[entropyBytes];

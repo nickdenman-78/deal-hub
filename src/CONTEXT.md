@@ -17,7 +17,37 @@ owned, and which word not to use. One entry per term:
 What it means here, which module owns it, and the word(s) to avoid.
 ```
 
+### Term
+A period of whole months in the shared kernel (`Ets.Core.Domain.ValueObjects.Term`, a `DateRange`). Its span
+and name (`Apr26`, `Q126`, `JJ26`, `Cal26`, `Fin22/23`, `Feb26-May26`) are derived from its dates.
+`Term.Create(name)` also accepts `Fin2223`, `Fin23` (meaning Fin22/23) and a bare compliance year. Avoid
+"tenor" and "period" for it.
+
+### Amount
+A dollar value with an explicit `AmountUnit` (`c/kWh`, `$/MWh`, `c/kW`, `$/MW`, or none for plain dollars),
+in the shared kernel. Distinct from `Money` (plain dollars) and `Price` (always $/MWh).
+
+### Retail deal
+The only deal aggregate modelled so far (`Ets.Modules.Deals.Domain.Models.RetailDeal`), event sourced, created
+by `RetailDeal.Capture`. Its id is `DealId`.
+
 ## Invariants
+
+### Shared kernel
+
+- **Terms always cover whole months.** `Term.Create(start, end)` widens its dates to the first and last day
+  of their months, because every naming convention is month-based.
+- **Contact identifiers that carry `IsValid` keep invalid input.** `PhoneNumber`, `ABN` and `ACN` flag a
+  failed check instead of rejecting, as the CML models it, so imported counterparty data is never lost.
+- **Cron schedules are Quartz expressions, evaluated outside the domain.** `CronSchedule` accepts only
+  Quartz-shaped expressions (six or seven fields, one `?` day field) and holds no scheduler; occurrences and
+  full validation come from `ICronScheduleEvaluator` (Quartz, in Infrastructure), because the architecture
+  tests keep Quartz out of Domain and Application, and jobs are scheduled with Quartz (ADR-0015).
+
+### Deals
+
+- **A retail deal's id is assigned by its first event.** `RetailDealCaptured` is always the first event of
+  the stream; the id comes from `IIdGenerator`, never from the store (ADR-0014).
 
 Rules every change must preserve, grouped by module. State each as a rule and its reason.
 
@@ -51,8 +81,9 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
 - **The local Keycloak realm is a starter.** `Realms/ets-realm.json` declares the `ets-api` audience client, a
   public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user — local only. The Users
   module will provision real users.
-- **The Deals module has no domain.** Its five projects carry only their composition roots, permission
-  catalogue and OpenAPI document; there is no `deal` CML yet, so no aggregate, event, handler or endpoint.
+- **The Deals domain is the retail deal alone.** `RetailDeal` can be captured and rehydrated, and `DealName`
+  exists, but no deal carries a name, reference, product or lifecycle yet, and there is no command, handler
+  or endpoint for any of it.
 - **Deals has no persistence adapter.** No Marten store (`IDealsStore`), unit of work or
   `IDealReferenceGenerator` is registered by `AddDealsModule`.
 - **Permission claims are not populated.** `AddCoreAuthorization` declares one policy per permission and
@@ -60,15 +91,14 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
   Users module's `IUserPermissionsQuery`, which does not exist. Until it does, every permission policy
   denies.
 - **The kernel has no messaging, caching or scheduling helpers.** Wolverine, Marten, FusionCache and Quartz
-  registration is not in `Ets.Core.Infrastructure`; the packages are not referenced.
-- **No shared-kernel CML.** `Money`, `Price`, `Volume`, `Percent`, `Factor`, `NEMRegion`,
-  `StateOrTerritory`, `HolidayState` and `DateRange` exist in `Ets.Core.Domain` (carried over from the
-  retail kernel) but `modelling/ddd/shared/shared.cml` does not model them yet.
-- **No unit or integration test projects.** `EtsCoreTests` and `EtsDealsTests` are named in
-  `InternalsVisibleTo` and in `CLAUDE.md` but do not exist; only `EtsArchitectureTests` does.
-- **Convention tests skip until their subject exists.** The endpoint, handler, validator, aggregate, entity
-  and domain-event conventions in `EtsArchitectureTests` report as skipped for Deals, which has none of
-  those yet.
+  job registration is not in `Ets.Core.Infrastructure`; Quartz is referenced only to evaluate `CronSchedule`
+  expressions (`QuartzCronScheduleEvaluator`).
+- **`Price` has no shared-kernel CML.** `modelling/ddd/shared/shared.cml` models every other kernel value
+  object, but `Price` ($/MWh) exists only in `Ets.Core.Domain`.
+- **No integration test projects.** `EtsCoreTests` and `EtsDealsTests` hold unit tests of the kernel value
+  objects and the Deals domain; nothing yet runs against Testcontainers.
+- **Convention tests skip until their subject exists.** The endpoint, handler and validator conventions in
+  `EtsArchitectureTests` report as skipped for Deals, which has none of those yet.
 
 ## Flagged ambiguities
 
@@ -77,3 +107,15 @@ Places where documents, model and code use different names for the same thing, a
 - **Anonymous endpoints.** ADR-0003 says a `null` policy leaves a class of endpoints anonymous; ADR-0006 says
   there is no switch that disables authorization. ADR-0006 wins: `DealsAuthorizationPolicies` requires every
   policy name, and tests authenticate against a Keycloak container.
+- **`DealCaptureContext`'s CML module is not a namespace.** `deals.cml` groups its elements in
+  `Module DealCapture`, but the Deals domain keeps `Models/`, `ValueObjects/` and `Events/` at the project
+  root, because the architecture tests pin domain events to `Ets.Modules.Deals.Domain.Events`. The code wins
+  until the tests change.
+- **`Address.address` is `StreetAddress` in code.** A C# member cannot share its type's name.
+- **`CronSchedule`'s dates and time zone are richer than the CML.** The CML has `Date startDate`,
+  `Date endDate` and `String timeZone`; the C# has `DateTimeOffset?` dates and a `TimeZoneInfo`.
+- **Some kernel value objects throw instead of returning `Result`.** `EmailAddress`, `Term.Create(name)` and
+  the Deals `DealName` (from retail-systems) throw `ArgumentException` on invalid input, where the kernel
+  convention is `Result.Failure(DomainError.*)`.
+- **`DateValue`, `TimeRange` and `EmailAddress` differ in shape from the CML.** `DateValue.TimePart` is a
+  `TimeOnly` and `TimeZoneInfo` a `TimeZoneInfo` (CML: `String`); `EmailAddress.IsValid` means "not empty".

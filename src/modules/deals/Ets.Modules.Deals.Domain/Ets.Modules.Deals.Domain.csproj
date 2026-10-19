@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Description>Deals module domain: the event-sourced deal aggregates, their value objects, domain events and repository ports. A reflection of modelling/ddd/deal/*.cml.</Description>
+        <Description>Deals module domain: the event-sourced deal aggregates, their value objects, domain events and repository ports. A reflection of modelling/ddd/deals/*.cml.</Description>
     </PropertyGroup>
 
     <!-- Domain depends on the shared kernel only. No EF Core, ASP.NET Core, Wolverine or Marten. -->

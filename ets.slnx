@@ -35,7 +35,12 @@
   <Folder Name="/modelling/ddd/">
     <File Path="modelling/ddd/readme.md" />
   </Folder>
+  <Folder Name="/modelling/ddd/deals/">
+    <File Path="modelling/ddd/deals/deals.cml" />
+    <File Path="modelling/ddd/deals/ubiquitous.md" />
+  </Folder>
   <Folder Name="/modelling/ddd/shared/">
+    <File Path="modelling/ddd/shared/shared.cml" />
     <File Path="modelling/ddd/shared/ubiquitous.md" />
   </Folder>
   <Folder Name="/src/">
@@ -67,5 +72,12 @@
   </Folder>
   <Folder Name="/tests/architecture/">
     <Project Path="tests/architecture/EtsArchitectureTests/EtsArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/core/">
+    <Project Path="tests/core/EtsCoreTests/EtsCoreTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/modules/" />
+  <Folder Name="/tests/modules/deals/">
+    <Project Path="tests/modules/deals/EtsDealsTests/EtsDealsTests.csproj" />
   </Folder>
 </Solution>

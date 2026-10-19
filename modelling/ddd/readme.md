@@ -30,6 +30,19 @@ _Describe each context here once it is modelled: its purpose, its aggregates and
 commands that drive it, and its relationships on the context map (shared kernel, upstream/downstream,
 ACL/OHS/PL)._
 
+### SharedContext (`shared/shared.cml`)
+
+The shared kernel: the value objects every context speaks in. Basic numbers (`Percent`, `Money`, `Factor`,
+`Number`), quantities with explicit units (`Amount` per kW/MW/kWh/MWh, `Volume` in kW/MW/kWh/MWh), contact
+and legal identifiers (`EmailAddress`, `PhoneNumber`, `ABN`, `ACN`, `Address`), time (`DateValue`,
+`DateRange`, `TimeRange`, `Term`, `CronSchedule`) and the NEM's geography (`NEMRegion`, `StateOrTerritory`,
+`HolidayState`). It has no aggregates. Implemented in `src/core/Ets.Core.Domain`.
+
+### DealCaptureContext (`deals/deals.cml`)
+
+Captures deals. Its one aggregate so far is `RetailDeal`, identified by a `DealId`; `DealName` is the
+trader-facing name. It shares the kernel (`[SK]<->[SK] SharedContext`). Implemented in `src/modules/deals/` (event sourced).
+
 ## Rendering
 
 The Context Mapper VS Code extension renders context maps and PlantUML diagrams. A local PlantUML server

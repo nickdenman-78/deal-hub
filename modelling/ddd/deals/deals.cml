@@ -1,0 +1,33 @@
+﻿import "../shared/shared.cml"
+
+ContextMap DealCapture {
+	contains DealCaptureContext
+	contains SharedContext
+	contains CustomerContext
+	
+	DealCaptureContext [SK]<->[SK] SharedContext
+}
+
+BoundedContext DealCaptureContext {
+	type = APPLICATION
+
+	Module DealCapture {
+	
+        ValueObject DealId {
+            Guid id
+        }
+
+        ValueObject DealName {
+            String value
+        }
+
+		Aggregate RetailDeal {
+			Entity RetailDeal {
+				aggregateRoot
+
+				/* Properties */
+				DealId id
+			}
+		}
+	}
+}

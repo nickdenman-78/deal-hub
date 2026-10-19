@@ -2,6 +2,7 @@ using Ets.Core.Domain.Models;
 using Ets.Core.Domain.Services;
 using Ets.Core.Infrastructure.Identity;
 using Ets.Core.Infrastructure.Persistence;
+using Ets.Core.Infrastructure.Scheduling;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -10,8 +11,8 @@ namespace Ets.Core.Infrastructure;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    ///     Registers the cross-module infrastructure every module relies on: the Guid v7 id generator and the
-    ///     request's caller.
+    ///     Registers the cross-module infrastructure every module relies on: the Guid v7 id generator, the
+    ///     request's caller and the Quartz cron schedule evaluator.
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
     /// <returns>The same service collection for method chaining.</returns>
@@ -25,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.TryAddScoped<IContextUser, HttpContextUser>();
         services.TryAddSingleton<IIdGenerator, GuidV7IdGenerator>();
+        services.TryAddSingleton<ICronScheduleEvaluator, QuartzCronScheduleEvaluator>();
 
         return services;
     }

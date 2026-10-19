@@ -7,6 +7,7 @@
     <!-- Deliberately free of EF Core, ASP.NET Core, Wolverine, Marten and Npgsql; the architecture tests
          fail if any of them appears here. -->
     <ItemGroup>
+        <PackageReference Include="CronExpressionDescriptor"/>
         <PackageReference Include="FluentValidation"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
