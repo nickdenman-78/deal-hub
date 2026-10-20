@@ -50,6 +50,9 @@ in the shared kernel. Distinct from `Money` (plain dollars) and `Price` (always 
 - **A product code's term is derived, never entered.** `ProductCode.Create` decodes `BNH26` to `Q126` and a
   strip's Z or M expiry to the following `Cal` or `Fin` year (`HNZ26` is `Cal27`), so a deal's term cannot
   disagree with its code.
+- **Deals keeps reference data in EF Core and deals in Marten.** `DealsDbContext` (schema `deals`) holds only
+  lookup data such as `asx_products`; a deal is never a row there, because ADR-0013 keeps every Deals
+  aggregate in its event stream.
 
 Rules every change must preserve, grouped by module. State each as a rule and its reason.
 
@@ -70,7 +73,9 @@ The sections each module binds, named by their `SectionName` constants.
 | `Keycloak` | `Ets.Servers.Api` — `KeycloakOptions.SectionName` | Required: `Authority` (realm URL, also the issuer) and `Audience` (`ets-api`). `ReferenceUiClientId` lets the Scalar UI sign in, Development only. `RequireHttpsMetadata` is `false` only for the local container. The AppHost supplies `Authority`. |
 | `Seq` | `Ets.Servers.Api` — `SeqOptions.SectionName` | Optional. `ServerUrl` (and `ApiKey`) for the Serilog sink; absent means console only. The AppHost supplies `ServerUrl`. |
 | `Cors:Origins` | `Ets.Servers.Api` | Optional. Browser origins allowed to call the API; empty means none. |
-| `ConnectionStrings:ets`, `:redis`, `:rabbitmq` | the AppHost passes them; nothing reads them yet | The keys the Aspire client integrations will read once a module adopts PostgreSQL, Redis or RabbitMQ. |
+| `ConnectionStrings:ets` | `Ets.Modules.Deals.Infrastructure` — `DealsDbContext.ConnectionStringName` | The AppHost passes it. Read directly by `UseNpgsql`, until the Aspire Npgsql client integration is adopted. |
+| `ConnectionStrings:ets` (design time) | `DealsDbContextFactory`, from `Ets.Modules.Deals.Infrastructure/appsettings.Migrations.json` | Only the `dotnet ef` tools read it, never the API, so ADR-0005's host-only rule is unaffected. Overridden by the git-ignored `appsettings.Migrations.local.json` and the `ConnectionStrings__ets` environment variable; no password is committed. |
+| `ConnectionStrings:redis`, `:rabbitmq` | the AppHost passes them; nothing reads them yet | The keys the Aspire client integrations will read once a module adopts Redis or RabbitMQ. |
 
 ## Known gaps
 
@@ -83,12 +88,12 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
 - **The local Keycloak realm is a starter.** `Realms/ets-realm.json` declares the `ets-api` audience client, a
   public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user — local only. The Users
   module will provision real users.
-- **ASX futures deals have a domain but no use case.** The `ExchangeDeal` aggregate, its `AsxFuturesDeal`
-  subtype, their value objects and `AsxFuturesDealCaptured` exist in `Ets.Modules.Deals.Domain`, but
-  `CaptureAsxFuturesDeal` has no command, handler, validator or endpoint, and nothing implements
-  `IAsxProductCatalogue`.
-- **Deals has no persistence adapter.** No Marten store (`IDealsStore`), unit of work or
+- **`CaptureAsxFuturesDealCommand` has a handler but no route.** Its handler needs `IExchangeDealRepository`
+  and `IDealsUnitOfWork`, which nothing implements yet, so it cannot be resolved in the host.
+- **Deals has no event store.** No Marten store (`IDealsStore`), `IExchangeDealRepository`, unit of work or
   `IDealReferenceGenerator` is registered by `AddDealsModule`.
+- **The ASX product catalogue is empty.** `deals.asx_products` backs `IAsxProductCatalogue`, but nothing loads
+  ASX's contract size schedule into it, so every product code is reported as not listed.
 - **Permission claims are not populated.** `AddCoreAuthorization` declares one policy per permission and
   each requires a `permission` claim, but no `IClaimsTransformation` adds those claims — it depends on the
   Users module's `IUserPermissionsQuery`, which does not exist. Until it does, every permission policy

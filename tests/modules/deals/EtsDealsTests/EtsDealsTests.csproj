@@ -14,6 +14,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\src\modules\deals\Ets.Modules.Deals.Domain\Ets.Modules.Deals.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\..\src\modules\deals\Ets.Modules.Deals.Application\Ets.Modules.Deals.Application.csproj"/>
         <ProjectReference Include="..\..\..\..\src\core\Ets.Core.Application\Ets.Core.Application.csproj"/>
     </ItemGroup>
 

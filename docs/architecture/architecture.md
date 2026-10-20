@@ -24,7 +24,7 @@ by the product scope; the CML decides the final set.
 
 | Module | Persistence |
 |---|---|
-| Deals, Settlement | Marten event store (ancillary store, own schema) + read-model projections |
+| Deals, Settlement | Marten event store (ancillary store, own schema) + read-model projections; Deals also has an EF Core context for reference data its write side looks up (the ASX product catalogue), never for an aggregate |
 | Risk, Users, MarketData, Counterparties | EF Core, own schema |
 
 Cross-module flow is by integration events over **Wolverine + RabbitMQ** with a transactional outbox and

@@ -19,6 +19,7 @@ Frontend conventions: [`src/clients/CONTEXT.md`](src/clients/CONTEXT.md).
 | [Node.js](https://nodejs.org/)                    | 22 or later                               | `node -v`          |
 | [pnpm](https://pnpm.io/)                          | Any recent version (see below)            | `pnpm -v`          |
 | [Aspire CLI](https://aspire.dev/) _(optional)_    | For `aspire run`; `dotnet run` also works | `aspire --version` |
+| [dotnet-ef](https://learn.microsoft.com/ef/core/cli/dotnet) | For database migrations; `dotnet tool install --global dotnet-ef` | `dotnet ef --version` |
 
 **pnpm.** Install it once with `npm install -g pnpm`. The workspace pins
 `pnpm@10.18.0` in `src/clients/package.json`, and newer pnpm versions switch
@@ -102,6 +103,72 @@ The web app's defaults match the AppHost. To override them, copy
 | `VITE_OIDC_CLIENT_ID` | `ets-web`                           |
 | `VITE_OIDC_SCOPE`     | `openid profile email`              |
 | `ETS_API`             | `http://localhost:5201` (dev proxy) |
+
+## Database migrations
+
+Each module owns a PostgreSQL schema in the `ets` database (`deals`, and later
+`risk`, `settlement`, …) and its own EF Core migrations under
+`Persistence\Migrations` in its Infrastructure project. Nothing applies
+migrations when the AppHost starts, so run `database update` yourself after
+adding a migration or recreating the PostgreSQL container.
+
+**Add a migration** after changing a module's EF Core model. This only writes
+C# files; it never connects to the database.
+
+```powershell
+dotnet ef migrations add <Name> --project src\modules\deals\Ets.Modules.Deals.Infrastructure --context DealsDbContext --output-dir Persistence\Migrations
+```
+
+**Apply migrations** to the local database. The command reads the connection
+string from `appsettings.Migrations.json` in the Infrastructure project, which
+has no password. Give it the real one first:
+
+1. Start the AppHost (`aspire run`) and wait until PostgreSQL is running.
+2. In the Aspire dashboard, open the `ets-api` resource and copy the value of
+   its `ConnectionStrings__ets` environment variable.
+3. Create `appsettings.Migrations.local.json` beside
+   `appsettings.Migrations.json` (git ignores it) with:
+
+   ```json
+   {
+     "ConnectionStrings": {
+       "ets": "<the value you copied>"
+     }
+   }
+   ```
+
+4. Run:
+
+   ```powershell
+   dotnet ef database update --project src\modules\deals\Ets.Modules.Deals.Infrastructure --context DealsDbContext
+   ```
+
+Instead of the local file you can set the `ConnectionStrings__ets`
+environment variable, or pass `--connection "<connection string>"` to
+`database update`.
+
+**The PostgreSQL password.** The AppHost does not set one: Aspire generates
+a random password on the first run and saves it in the AppHost's user secrets
+as `Parameters:postgres-password` (in `%APPDATA%\Microsoft\UserSecrets\ets-aspire-apphost\secrets.json`,
+never in the repo). The username is `postgres`. To see it:
+
+```powershell
+dotnet user-secrets list --project src\aspire\Ets.Aspire.AppHost
+```
+
+To choose your own, set it before the container is first created. The
+container is persistent and PostgreSQL only reads the password when its volume
+is initialised, so changing it later also means deleting the `postgres`
+container and its volume, and with them the local data:
+
+```powershell
+dotnet user-secrets set "Parameters:postgres-password" "<password>" --project src\aspire\Ets.Aspire.AppHost
+```
+
+**Inspecting the database** (DataGrip, psql, …): connect to the `ets`
+database with the host, port and password from that connection string; the
+port is not always 5432. DataGrip shows only the `public` schema until you
+tick the module schemas in the data source's **Schemas** tab.
 
 ## Test, lint and format
 

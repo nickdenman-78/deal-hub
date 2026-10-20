@@ -1,4 +1,7 @@
 using Ets.Modules.Deals.Application;
+using Ets.Modules.Deals.Domain.Services;
+using Ets.Modules.Deals.Infrastructure.Persistence;
+using Ets.Modules.Deals.Infrastructure.Products;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,6 +32,11 @@ public static class DealsModule
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddDealsApplication();
+
+        string? connectionString = configuration.GetConnectionString(DealsDbContext.ConnectionStringName);
+        services.AddDbContext<DealsDbContext>(options => DealsDbContext.Configure(options, connectionString));
+
+        services.AddScoped<IAsxProductCatalogue, AsxProductCatalogue>();
 
         return services;
     }
