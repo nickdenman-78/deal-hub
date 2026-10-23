@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Deals module infrastructure: adapters (Marten event store, reference generator, Wolverine messaging, Quartz jobs) and the service-side composition root.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
+        <PackageReference Include="EFCore.NamingConventions"/>
+        <!-- dotnet ef migrations add runs against this project (DealsDbContextFactory). -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <!-- Design-time settings for DealsDbContextFactory. Copied beside the assembly because the dotnet ef tools
+         run it from the build output. The local file holds a real connection string and is git-ignored. -->
+    <ItemGroup>
+        <None Update="appsettings.Migrations.json" CopyToOutputDirectory="PreserveNewest"/>
+        <None Update="appsettings.Migrations.local.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <!-- Deliberately does NOT reference Presentation: the route-side composition root lives there, so
+         neither layer depends on the other. The host composes both (ADR-0003). -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\core\Ets.Core.Application\Ets.Core.Application.csproj"/>
+        <ProjectReference Include="..\..\..\core\Ets.Core.Infrastructure\Ets.Core.Infrastructure.csproj"/>
+        <ProjectReference Include="..\Ets.Modules.Deals.Application\Ets.Modules.Deals.Application.csproj"/>
+        <ProjectReference Include="..\Ets.Modules.Deals.IntegrationEvents\Ets.Modules.Deals.IntegrationEvents.csproj"/>
+    </ItemGroup>
+
+</Project>

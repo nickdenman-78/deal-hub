@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Shared kernel: tactical DDD base types, Result and DomainError, CQRS contracts and decorators, enumerations, business references and shared-kernel value objects.</Description>
+    </PropertyGroup>
+
+    <!-- Deliberately free of EF Core, ASP.NET Core, Wolverine, Marten and Npgsql; the architecture tests
+         fail if any of them appears here. -->
+    <ItemGroup>
+        <PackageReference Include="CronExpressionDescriptor"/>
+        <PackageReference Include="FluentValidation"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+        <PackageReference Include="Scrutor"/>
+        <PackageReference Include="Serilog"/>
+    </ItemGroup>
+
+</Project>

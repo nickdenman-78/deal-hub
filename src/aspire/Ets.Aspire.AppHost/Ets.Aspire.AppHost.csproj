@@ -1,0 +1,39 @@
+<!-- The Aspire.AppHost.Sdk version is pinned in global.json (msbuild-sdks), beside the .NET SDK. -->
+<Project Sdk="Aspire.AppHost.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <!-- Rider does not always inherit the TFM from Directory.Build.props for Aspire.AppHost.Sdk. -->
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Ets.Aspire.AppHost</AssemblyName>
+        <RootNamespace>Ets.Aspire.AppHost</RootNamespace>
+        <UserSecretsId>ets-aspire-apphost</UserSecretsId>
+        <Description>Local orchestration for the ETS API host and its backing services. Development only — not a deployment artefact (ADR-0007).</Description>
+
+        <!-- ADR-0007: the Aspire hosting packages pull newer Microsoft.Extensions.* lines. Under solution-wide
+             transitive pinning those would force the central versions up for every project. The AppHost ships
+             nothing, so it opts out here instead. The SDK version in global.json must stay in step with the
+             Aspire.Hosting.* versions in Directory.Packages.props. -->
+        <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+
+        <!-- ADR-0007: the dashboard and DCP come from the Aspire CLI bundle (ASPIRE010), run through dnx at the
+             version paired with the AppHost SDK in global.json — not whatever `aspire` is on PATH. -->
+        <AspireUseCliBundle>true</AspireUseCliBundle>
+        <AspireCliInvocationMode>DnxPinned</AspireCliInvocationMode>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\hosts\Ets.Servers.Api\Ets.Servers.Api.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.Keycloak"/>
+        <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
+        <PackageReference Include="Aspire.Hosting.RabbitMQ"/>
+        <PackageReference Include="Aspire.Hosting.Redis"/>
+        <PackageReference Include="Aspire.Hosting.Seq"/>
+        <!-- Lifts the vulnerable transitive MessagePack; see Directory.Packages.props. -->
+        <PackageReference Include="MessagePack"/>
+    </ItemGroup>
+
+</Project>

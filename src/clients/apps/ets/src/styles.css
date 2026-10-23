@@ -1,0 +1,14 @@
+/* Import order is enforced by the parser: @import must precede all rules.
+ *   fonts  — the faces
+ *   theme  — the tokens, which everything below reads
+ *   base   — the reset, which reads them
+ *   layout / table / blade — component stylesheets
+ *
+ * editor.css is deliberately absent until the app adopts @ets/editor.
+ */
+@import '@ets/brand/fonts.css';
+@import '@ets/ui/styles/theme.css';
+@import '@ets/ui/styles/base.css';
+@import '@ets/ui/styles/layout.css';
+@import '@ets/ui/styles/table.css';
+@import '@ets/ui/styles/blade.css';

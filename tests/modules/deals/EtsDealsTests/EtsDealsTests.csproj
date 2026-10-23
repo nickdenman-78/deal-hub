@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- xUnit v3, Shouldly and the test SDK come from tests/Directory.Build.props. -->
+
+    <PropertyGroup>
+        <RootNamespace>EtsDealsTests</RootNamespace>
+        <AssemblyName>EtsDealsTests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Shouldly"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\src\modules\deals\Ets.Modules.Deals.Domain\Ets.Modules.Deals.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\..\src\modules\deals\Ets.Modules.Deals.Application\Ets.Modules.Deals.Application.csproj"/>
+        <ProjectReference Include="..\..\..\..\src\core\Ets.Core.Application\Ets.Core.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

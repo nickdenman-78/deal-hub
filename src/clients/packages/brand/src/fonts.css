@@ -1,0 +1,31 @@
+/* ETS faces — self-hosted.
+ *
+ * Deliberately NOT a Google Fonts `@import url(https://fonts.googleapis.com/…)`.
+ * Three reasons: a blocked corporate network silently degrades every app to
+ * Arial with no error; it is a third-party request per user on an internal
+ * tool; and it makes the apps unusable offline. The faces come from @fontsource
+ * instead, so they are ordinary dependencies that Vite fingerprints and serves
+ * from our own origin.
+ *
+ * Imported separately from tokens.css because the two have different consumers:
+ * every surface wants the tokens, but only the SPAs want to pay for font bytes.
+ *
+ * Each face declares `unicode-range`, so a browser downloads only the subsets a
+ * page actually renders — importing the full-subset files below costs nothing
+ * extra in practice, and means a counterparty name with a diacritic still
+ * renders in the brand face rather than falling back mid-word.
+ *
+ * Family names are NOT the plain family: @fontsource's variable builds register
+ * as "<Family> Variable". tokens.css's --font-* stacks match these exactly —
+ * change one, change the other.
+ */
+
+/* IBM Plex Sans — interface, headings and data. Variable weight axis only; the
+   width axis and italics are unused and deliberately not imported. */
+@import '@fontsource-variable/ibm-plex-sans/wght.css';
+
+/* IBM Plex Mono — deal references, codes, JSON editors. No variable build, so
+   the three static weights the UI actually sets. */
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';

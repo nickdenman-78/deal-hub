@@ -1,0 +1,162 @@
+﻿BoundedContext SharedContext {
+	type = APPLICATION
+
+    Module Core {
+
+        BasicType Percent {
+            Decimal percent
+        }
+
+        BasicType Money {
+            Decimal money
+        }
+
+        BasicType Factor {
+            Decimal factor
+        }
+
+        ValueObject Number {
+            Decimal value
+            String rawValue
+            int decimals
+        }
+
+        ValueObject Amount {
+            Decimal value
+            - @AmountUnit unit
+        }
+
+        ValueObject Volume {
+            Decimal value
+            - @VolumeUnit unit
+        }
+
+        ValueObject EmailAddress {
+            String value
+            boolean isValid
+        }
+
+        ValueObject PhoneNumber {
+            String value
+            boolean isValid
+        }
+
+        ValueObject ABN {
+            String value
+            boolean isValid
+        }
+
+        ValueObject ACN {
+            String value
+            boolean isValid
+        }
+
+        ValueObject Address {
+            String address
+            String suburb
+            - @StateOrTerritory stateOrTerritory
+            String postcode
+        }
+
+        ValueObject DateValue {
+            DateTime value
+            Date datePart
+            String timePart
+            String timeZoneInfo
+        }
+
+        ValueObject DateRange {
+            Date startDate
+            Date endDate
+        }
+
+        ValueObject TimeRange {
+            Time from
+            Time to
+        }
+
+        ValueObject Term {
+            String name
+            Date startDate
+            Date endDate
+            - @TermSpan span
+        }
+
+        enum TermPeriodValue {
+            None, Months, Quarters, HalfYears, FinYears, CalYears, All, AllButMonths, FullYears
+        }
+
+        enum TermSpanValue {
+            NonStandard, Month, JanJun, JulDec, Quarter, FinYear, CalYear
+        }
+
+        ValueObject TermSpan {
+            - @TermSpanValue value
+            String code
+            String description
+            int sortOrder
+        }
+
+        ValueObject CronSchedule {
+            Date startDate
+            Date endDate
+            String timeZone
+            String expression
+            String description
+        }
+
+        enum AmountUnitValue {
+            None, CentsPerKW, DollarPerMW, CentsPerKWh, DollarPerMWh
+        }
+
+        ValueObject AmountUnit {
+            - @AmountUnitValue value
+            Decimal conversionFactor
+            String description
+            String symbol
+        }
+
+        enum VolumeUnitValue {
+            None, KW, MW, KWh, MWh
+        }
+
+        ValueObject VolumeUnit {
+            - @VolumeUnitValue value
+            Decimal conversionFactor
+            String description
+            String symbol
+        }
+
+        enum HolidayStateValue {
+            NEM, QLD, NSW, ACT, VIC, SA, WA, TAS, NT
+        }
+
+        ValueObject HolidayState {
+            - @HolidayStateValue value
+            String groupName
+            String description
+        }
+
+        enum NEMRegionValue {
+            None, QLD, NSW, VIC, TAS, SA
+        }
+
+        ValueObject NEMRegion {
+            - @NEMRegionValue value
+            String legacyName
+            String description
+            - @StateOrTerritory stateOrTerritory
+            int sortOrder
+        }
+
+        enum StateOrTerritoryValue {
+            None, QLD, NSW, NSWACT, ACT, VIC, SA, WA, TAS, NT, NZ
+        }
+
+        ValueObject StateOrTerritory {
+            - @StateOrTerritoryValue value
+            String description
+            int sortOrder
+        }
+    }
+}

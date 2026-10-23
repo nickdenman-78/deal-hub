@@ -1,0 +1,83 @@
+<Solution>
+  <Folder Name="/solution items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="CLAUDE.md" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/docs/architecture/">
+    <File Path="docs/architecture/architecture.md" />
+    <File Path="docs/architecture/kernel.md" />
+  </Folder>
+  <Folder Name="/docs/architecture/adr/">
+    <File Path="docs/architecture/adr/0001-layered-csprojs-per-module.md" />
+    <File Path="docs/architecture/adr/0002-endpoints-discovered-by-di.md" />
+    <File Path="docs/architecture/adr/0003-module-composition-root-split-in-two.md" />
+    <File Path="docs/architecture/adr/0004-integration-events-as-public-api.md" />
+    <File Path="docs/architecture/adr/0005-module-configuration-sections-not-files.md" />
+    <File Path="docs/architecture/adr/0006-keycloak-with-permission-based-authorization.md" />
+    <File Path="docs/architecture/adr/0007-aspire-for-local-orchestration.md" />
+    <File Path="docs/architecture/adr/0008-cqrs-decorators-registered-once.md" />
+    <File Path="docs/architecture/adr/0009-model-first-ddd-with-context-mapper.md" />
+    <File Path="docs/architecture/adr/0010-persistence-conventions.md" />
+    <File Path="docs/architecture/adr/0011-messaging-with-wolverine-and-rabbitmq.md" />
+    <File Path="docs/architecture/adr/0012-caching-with-fusioncache-and-redis.md" />
+    <File Path="docs/architecture/adr/0013-event-sourcing-with-marten.md" />
+    <File Path="docs/architecture/adr/0014-guid-v7-ids-and-business-references.md" />
+    <File Path="docs/architecture/adr/0015-scheduling-with-quartz.md" />
+    <File Path="docs/architecture/adr/0016-observability-and-health.md" />
+    <File Path="docs/architecture/adr/0017-testing-strategy.md" />
+    <File Path="docs/architecture/adr/0018-archunitnet-for-architecture-tests.md" />
+    <File Path="docs/architecture/adr/index.md" />
+  </Folder>
+  <Folder Name="/modelling/ddd/">
+    <File Path="modelling/ddd/readme.md" />
+  </Folder>
+  <Folder Name="/modelling/ddd/deals/">
+    <File Path="modelling/ddd/deals/deals.cml" />
+    <File Path="modelling/ddd/deals/ubiquitous.md" />
+  </Folder>
+  <Folder Name="/modelling/ddd/shared/">
+    <File Path="modelling/ddd/shared/shared.cml" />
+    <File Path="modelling/ddd/shared/ubiquitous.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/CONTEXT.md" />
+  </Folder>
+  <Folder Name="/src/core/">
+    <Project Path="src/core/Ets.Core.Domain/Ets.Core.Domain.csproj" />
+    <Project Path="src/core/Ets.Core.Application/Ets.Core.Application.csproj" />
+    <Project Path="src/core/Ets.Core.Infrastructure/Ets.Core.Infrastructure.csproj" />
+    <Project Path="src/core/Ets.Core.Presentation/Ets.Core.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/src/aspire/">
+    <Project Path="src/aspire/Ets.Aspire.AppHost/Ets.Aspire.AppHost.csproj" />
+    <Project Path="src/aspire/Ets.Aspire.ServiceDefaults/Ets.Aspire.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/hosts/">
+    <Project Path="src/hosts/Ets.Servers.Api/Ets.Servers.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/modules/" />
+  <Folder Name="/src/modules/deals/">
+    <Project Path="src/modules/deals/Ets.Modules.Deals.Domain/Ets.Modules.Deals.Domain.csproj" />
+    <Project Path="src/modules/deals/Ets.Modules.Deals.Application/Ets.Modules.Deals.Application.csproj" />
+    <Project Path="src/modules/deals/Ets.Modules.Deals.Infrastructure/Ets.Modules.Deals.Infrastructure.csproj" />
+    <Project Path="src/modules/deals/Ets.Modules.Deals.IntegrationEvents/Ets.Modules.Deals.IntegrationEvents.csproj" />
+    <Project Path="src/modules/deals/Ets.Modules.Deals.Presentation/Ets.Modules.Deals.Presentation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <File Path="tests/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/tests/architecture/">
+    <Project Path="tests/architecture/EtsArchitectureTests/EtsArchitectureTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/core/">
+    <Project Path="tests/core/EtsCoreTests/EtsCoreTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/modules/" />
+  <Folder Name="/tests/modules/deals/">
+    <Project Path="tests/modules/deals/EtsDealsTests/EtsDealsTests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,205 @@
+﻿import "../shared/shared.cml"
+
+ContextMap DealCapture {
+	contains DealCaptureContext
+	contains SharedContext
+	
+	DealCaptureContext [SK]<->[SK] SharedContext
+}
+
+BoundedContext DealCaptureContext {
+	type = APPLICATION
+
+	/*
+	 * Deals. So far: exchange-traded ASX 24 electricity futures, cash-settled contracts for difference
+	 * against the regional reference price of a NEM region. Source: ASX Australian Electricity Derivatives
+	 * fact sheet (June 2025) and ASX Energy Contract Sizes and Public Holiday Schedule 2026-2032.
+	 */
+	Module Deals {
+
+		ValueObject DealId {
+			Guid id
+		}
+
+		ValueObject DealName {
+			String value
+		}
+
+		/* ---------- Product: decoded from the ASX 24 product code ---------- */
+
+		/*
+		 * The trading window a contract covers (times AEST):
+		 *   BASE_LOAD     00:00-24:00 Monday to Sunday
+		 *   PEAK_LOAD     07:00-22:00 Monday to Friday, excluding public holidays (ASX holiday schedule)
+		 *   MORNING_PEAK  06:00-09:00 Monday to Sunday
+		 *   EVENING_PEAK  16:00-21:00 Monday to Sunday
+		 */
+		enum LoadProfileValue {
+			BaseLoad, PeakLoad, MorningPeak, EveningPeak
+		}
+
+		ValueObject LoadProfile {
+			- @LoadProfileValue value
+			- @TimeRange timeRange
+			boolean weekdaysOnly
+			boolean excludesPublicHolidays
+			String ^description
+		}
+
+		/*
+		 * How the contract pays out. Standard futures settle against the average spot price;
+		 * $300 cap futures settle against the average of spot prices above $300/MWh.
+		 */
+		enum FuturesPayoffValue {
+			Standard, Cap300
+		}
+
+		ValueObject FuturesPayoff {
+			- @FuturesPayoffValue value
+			Decimal strike
+			String ^description
+		}
+
+		/*
+		 * The period a contract is listed for. Months (base load only) and quarters are single contracts; a
+		 * strip is a calendar or financial year of four quarterly contracts, traded as one.
+		 */
+		enum ContractPeriodValue {
+			Month, Quarter, Strip
+		}
+
+		ValueObject ContractPeriod {
+			- @ContractPeriodValue value
+			String ^description
+		}
+
+		/*
+		 * The two-letter ASX 24 commodity code. The first letter names the product family, the second the
+		 * NEM region (N = NSW, V = VIC, Q = QLD, S = SA). ASX lists electricity futures for these four regions only.
+		 *   E  base load month             B  base load quarter             H  base load strip
+		 *   P  peak load quarter           D  peak load strip
+		 *   M  morning peak quarter        J  morning peak strip
+		 *   N  evening peak quarter        L  evening peak strip
+		 *   G  base load $300 cap quarter  R  base load $300 cap strip
+		 */
+		ValueObject CommodityCode {
+			String value
+			- @LoadProfile loadProfile
+			- @FuturesPayoff payoff
+			- @ContractPeriod period
+			- @NEMRegion region
+		}
+
+		/* Futures month letters: F G H J K M N Q U V X Z for January to December. */
+		enum ContractMonthValue {
+			Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+		}
+
+		ValueObject ContractMonth {
+			- @ContractMonthValue value
+			String code
+			int month
+		}
+
+		/*
+		 * The ASX 24 product code a trader quotes: commodity code + expiry month letter + expiry year,
+		 * e.g. BNH26 (NSW base load Q1 2026) or ENF27 (NSW base load January 2027). The Term is derived from it:
+		 *   month   - the expiry month itself (MmmYY)
+		 *   quarter - the quarter ending in the expiry month, H/M/U/Z only (QXYY)
+		 *   strip   - Z expiry: the calendar year after expiry (CalYY);
+		 *             M expiry: the financial year starting after expiry (FinYY/ZZ)
+		 * A code that does not decode to a listed product is rejected.
+		 */
+		ValueObject ProductCode {
+			String value
+			- @CommodityCode commodityCode
+			- @ContractMonth expiryMonth
+			int expiryYear
+			- @Term term
+		}
+
+		/*
+		 * MWh delivered per lot (1 MW) over the contract's term. Base load is days x 24 h; peak and
+		 * morning/evening peak sizes depend on ASX's holiday schedule, so the size is published by ASX per
+		 * listed contract rather than computed.
+		 */
+		ValueObject ContractSize {
+			int numberOfDays
+			- @Volume energy
+		}
+
+		/* A listed ASX product as it stood when the deal was captured: the decoded code and its contract size. */
+		ValueObject AsxProduct {
+			- @ProductCode productCode
+			- @ContractSize contractSize
+		}
+
+		/* ---------- Deal ---------- */
+
+		/* Whether the portfolio bought or sold the contracts. */
+		enum TradeDirectionValue {
+			Buy, Sell
+		}
+
+		ValueObject TradeDirection {
+			- @TradeDirectionValue value
+			String ^description
+		}
+
+		Aggregate ExchangeDeal {
+
+			/* A deal traded on an exchange. Abstract: each exchange product is a subtype. */
+			Entity ExchangeDeal {
+				aggregateRoot
+
+				/* Properties */
+				- @DealId id
+				- @TradeDirection direction
+			}
+
+			/*
+			 * An ASX electricity futures deal.
+			 * Invariants:
+			 *   - the product code decodes to a listed ASX product
+			 *   - volume is a whole number of lots, greater than zero, in MW (1 lot = 1 MW)
+			 *   - price is in $/MWh, to the minimum price movement of $0.01/MWh; a $300 cap price is not negative
+			 */
+			Entity AsxFuturesDeal extends @ExchangeDeal {
+
+				/* Properties */
+				- @AsxProduct product
+				- @Amount price
+				- @Volume volume
+
+				/* Behaviour */
+				def @AsxFuturesDeal capture(@AsxProduct product, @TradeDirection direction, @Amount price, @Volume volume);
+
+				/* Total MWh over the term: volume (lots) x contract size. */
+				def @Volume contractedEnergy();
+			}
+
+			/* Looks up listed products by code; the contract size comes from ASX's published schedule. */
+			Service AsxProductCatalogue {
+				@AsxProduct findListedProduct(@ProductCode productCode);
+			}
+
+			/* Capture an ASX futures deal from what the trader quotes: product code, direction, price and volume. */
+			CommandEvent CaptureAsxFuturesDeal {
+				String productCode
+				- @TradeDirection direction
+				- @Amount price
+				- @Volume volume
+			}
+
+			/* An ASX futures deal was captured. The first event of every ASX futures deal stream. */
+			DomainEvent AsxFuturesDealCaptured {
+				- @DealId dealId
+				- @AsxProduct product
+				- @TradeDirection direction
+				- @Amount price
+				- @Volume volume
+				DateTime occurredAt
+			}
+		}
+	}
+}
