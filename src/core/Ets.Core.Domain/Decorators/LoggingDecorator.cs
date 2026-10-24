@@ -83,14 +83,16 @@ internal static class LoggingDecorator
     [UsedImplicitly]
     internal sealed class CommandHandler<TCommand, TResponse>(
         ICommandHandler<TCommand, TResponse> decorated,
-        ILogger<ICommandHandler<TCommand, TResponse>> logger)
+        ILoggerFactory loggerFactory)
         : ICommandHandler<TCommand, TResponse>
         where TCommand : ICommand<TResponse>
     {
+        private readonly ILogger _logger = loggerFactory.CreateLogger<ICommandHandler<TCommand, TResponse>>();
+
         public Task<Result<TResponse>> HandleAsync(TCommand command, CancellationToken cancellationToken)
         {
             return ExecuteAsync(
-                logger,
+                _logger,
                 typeof(TCommand),
                 false,
                 () => decorated.HandleAsync(command, cancellationToken));
@@ -100,14 +102,16 @@ internal static class LoggingDecorator
     [UsedImplicitly]
     internal sealed class CommandBaseHandler<TCommand>(
         ICommandHandler<TCommand> decorated,
-        ILogger<ICommandHandler<TCommand>> logger)
+        ILoggerFactory loggerFactory)
         : ICommandHandler<TCommand>
         where TCommand : ICommand
     {
+        private readonly ILogger _logger = loggerFactory.CreateLogger<ICommandHandler<TCommand>>();
+
         public Task<Result> HandleAsync(TCommand command, CancellationToken cancellationToken)
         {
             return ExecuteAsync(
-                logger,
+                _logger,
                 typeof(TCommand),
                 false,
                 () => decorated.HandleAsync(command, cancellationToken));
@@ -117,14 +121,16 @@ internal static class LoggingDecorator
     [UsedImplicitly]
     internal sealed class QueryHandler<TQuery, TResponse>(
         IQueryHandler<TQuery, TResponse> decorated,
-        ILogger<IQueryHandler<TQuery, TResponse>> logger)
+        ILoggerFactory loggerFactory)
         : IQueryHandler<TQuery, TResponse>
         where TQuery : IQuery<TResponse>
     {
+        private readonly ILogger _logger = loggerFactory.CreateLogger<IQueryHandler<TQuery, TResponse>>();
+
         public Task<Result<TResponse>> HandleAsync(TQuery query, CancellationToken cancellationToken)
         {
             return ExecuteAsync(
-                logger,
+                _logger,
                 typeof(TQuery),
                 true,
                 () => decorated.HandleAsync(query, cancellationToken));

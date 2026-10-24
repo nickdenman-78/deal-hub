@@ -53,6 +53,13 @@ in the shared kernel. Distinct from `Money` (plain dollars) and `Price` (always 
 - **Deals keeps reference data in EF Core and deals in Marten.** `DealsDbContext` (schema `deals`) holds only
   lookup data such as `asx_products`; a deal is never a row there, because ADR-0013 keeps every Deals
   aggregate in its event stream.
+- **Deal events are stored in their value objects' plain forms.** Marten serializes events with
+  `DealsEventJson`'s converters: an enumeration as its `*Value` member name, `Amount` and `Volume` as their
+  unrounded value and unit, a `ProductCode` as its code. A stored event depends only on those forms, so a
+  value object's internals can change freely, but a stored form cannot change without a new event type.
+- **A deal's events are appended when the unit of work saves, not when the repository adds it.** The
+  repository only tracks the deal, so events raised after `Add` still reach the stream; an existing stream is
+  appended expecting the version it was loaded at, and a clash is a `Conflict` result.
 
 Rules every change must preserve, grouped by module. State each as a rule and its reason.
 
@@ -73,7 +80,7 @@ The sections each module binds, named by their `SectionName` constants.
 | `Keycloak` | `Ets.Servers.Api` — `KeycloakOptions.SectionName` | Required: `Authority` (realm URL, also the issuer) and `Audience` (`ets-api`). `ReferenceUiClientId` lets the Scalar UI sign in, Development only. `RequireHttpsMetadata` is `false` only for the local container. The AppHost supplies `Authority`. |
 | `Seq` | `Ets.Servers.Api` — `SeqOptions.SectionName` | Optional. `ServerUrl` (and `ApiKey`) for the Serilog sink; absent means console only. The AppHost supplies `ServerUrl`. |
 | `Cors:Origins` | `Ets.Servers.Api` | Optional. Browser origins allowed to call the API; empty means none. |
-| `ConnectionStrings:ets` | `Ets.Modules.Deals.Infrastructure` — `DealsDbContext.ConnectionStringName` | The AppHost passes it. Read directly by `UseNpgsql`, until the Aspire Npgsql client integration is adopted. |
+| `ConnectionStrings:ets` | `Ets.Servers.Api` (`AddNpgsqlDataSource`) and `Ets.Modules.Deals.Infrastructure` — `DealsDbContext.ConnectionStringName` | The AppHost passes it. The host's shared `NpgsqlDataSource` reads it for the Marten stores; `DealsDbContext` still reads it directly with `UseNpgsql`. |
 | `ConnectionStrings:ets` (design time) | `DealsDbContextFactory`, from `Ets.Modules.Deals.Infrastructure/appsettings.Migrations.json` | Only the `dotnet ef` tools read it, never the API, so ADR-0005's host-only rule is unaffected. Overridden by the git-ignored `appsettings.Migrations.local.json` and the `ConnectionStrings__ets` environment variable; no password is committed. |
 | `ConnectionStrings:redis`, `:rabbitmq` | the AppHost passes them; nothing reads them yet | The keys the Aspire client integrations will read once a module adopts Redis or RabbitMQ. |
 
@@ -81,17 +88,23 @@ The sections each module binds, named by their `SectionName` constants.
 
 Current shape that is incomplete, phrased as the shape ("X has a handler but no route"), never as a plan.
 
-- **The host uses only Keycloak and Seq of the services it is given.** The AppHost starts PostgreSQL, Redis,
-  RabbitMQ, Keycloak and Seq and passes their locations to `Ets.Servers.Api`, but only Keycloak (token
-  validation) and Seq (logs) are used. No Aspire client integration (`AddNpgsqlDataSource`,
-  `AddRedisClient`, `AddRabbitMQClient`) is registered, so `/health` checks only the process itself.
+- **The host does not use Redis or RabbitMQ.** The AppHost passes their locations to `Ets.Servers.Api`, but no
+  `AddRedisClient` or `AddRabbitMQClient` is registered. PostgreSQL is used through `AddNpgsqlDataSource`,
+  so `/health` checks the process and PostgreSQL only.
+- **`DealsDbContext` does not use the shared data source.** It reads `ConnectionStrings:ets` with
+  `UseNpgsql`, while the Marten store uses the host's `NpgsqlDataSource`, so the two hold separate pools.
 - **The local Keycloak realm is a starter.** `Realms/ets-realm.json` declares the `ets-api` audience client, a
   public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user — local only. The Users
   module will provision real users.
-- **`CaptureAsxFuturesDealCommand` has a handler but no route.** Its handler needs `IExchangeDealRepository`
-  and `IDealsUnitOfWork`, which nothing implements yet, so it cannot be resolved in the host.
-- **Deals has no event store.** No Marten store (`IDealsStore`), `IExchangeDealRepository`, unit of work or
-  `IDealReferenceGenerator` is registered by `AddDealsModule`.
+- **A captured deal cannot be read back.** `POST /api/deals/asx-futures` captures a deal into its Marten
+  stream, but there is no projection, no repository load and no read route; the `Location` it returns names
+  a route that does not exist yet.
+- **Captured deals have no business reference.** No `IDealReferenceGenerator` exists, so a deal is known only
+  by its Guid.
+- **The Deals unit of work publishes nothing.** It saves the Marten session alone; there is no Wolverine
+  outbox and no Deals integration event.
+- **The Deals event schema is created on first use.** The Marten store keeps Marten's default of creating
+  and updating `deals_events` objects at runtime; nothing applies them ahead of a deployment.
 - **The ASX product catalogue is empty.** `deals.asx_products` backs `IAsxProductCatalogue`, but nothing loads
   ASX's contract size schedule into it, so every product code is reported as not listed.
 - **Permission claims are not populated.** `AddCoreAuthorization` declares one policy per permission and
@@ -104,9 +117,8 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
 - **`Price` has no shared-kernel CML.** `modelling/ddd/shared/shared.cml` models every other kernel value
   object, but `Price` ($/MWh) exists only in `Ets.Core.Domain`.
 - **No integration test projects.** `EtsCoreTests` and `EtsDealsTests` hold unit tests of the kernel value
-  objects and the Deals domain; nothing yet runs against Testcontainers.
-- **Convention tests skip until their subject exists.** The endpoint, handler and validator conventions in
-  `EtsArchitectureTests` report as skipped for Deals, which has none of those yet.
+  objects, the Deals domain and the Deals event JSON; nothing yet runs against Testcontainers, so the Marten
+  repository, unit of work and capture route are untested against a database.
 
 ## Flagged ambiguities
 

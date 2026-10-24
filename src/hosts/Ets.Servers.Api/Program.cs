@@ -91,6 +91,10 @@ builder.Services.AddCoreApplication(builder.Configuration);
 // The Guid v7 id generator and the request's caller, before the modules so their contexts can use them.
 builder.Services.AddCoreInfrastructure();
 
+// The one PostgreSQL data source (ConnectionStrings:ets), shared by the modules' Marten stores. Aspire adds its
+// health check to /health and its traces and metrics to OpenTelemetry (ADR-0010, ADR-0016).
+builder.AddNpgsqlDataSource("ets");
+
 // ---- Modules: three lines each (ADR-0003) -------------------------------------------------------------------
 
 builder.Services

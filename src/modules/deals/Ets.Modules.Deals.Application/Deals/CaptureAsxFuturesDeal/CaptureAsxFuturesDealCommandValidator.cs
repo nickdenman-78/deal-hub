@@ -12,7 +12,7 @@ internal sealed class CaptureAsxFuturesDealCommandValidator : AbstractValidator<
     public CaptureAsxFuturesDealCommandValidator()
     {
         RuleFor(command => command.ProductCode).NotEmpty().WithMessage("A product code is required.");
-        RuleFor(command => command.Direction).NotNull().WithMessage("A trade direction is required.");
+        RuleFor(command => command.Direction).NotNull().WithMessage("A trade direction of Buy or Sell is required.");
         RuleFor(command => command.Price)
             .Must(price => price?.Value is not null)
             .WithMessage("A price is required.");

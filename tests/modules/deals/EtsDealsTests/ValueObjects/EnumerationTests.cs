@@ -27,7 +27,7 @@ public sealed class EnumerationTests
     public void ContractMonth_TryFromCode_Maps_TheFuturesMonthLetter(string code, ContractMonthValue month)
     {
         ContractMonth.TryFromCode(code, out var contractMonth).ShouldBeTrue();
-        contractMonth!.Value.ShouldBe(month);
+        contractMonth.Value.ShouldBe(month);
         contractMonth.Month.ShouldBe((int)month);
     }
 
@@ -73,7 +73,7 @@ public sealed class EnumerationTests
     public void ShoulderPeaks_Cover_EveryDay(string name, int fromHour, int toHour)
     {
         LoadProfile.TryParse(name, out var profile).ShouldBeTrue();
-        profile!.WeekdaysOnly.ShouldBeFalse();
+        profile.WeekdaysOnly.ShouldBeFalse();
         profile.TimeRange.ShouldBe(new TimeRange(new TimeOnly(fromHour, 0), new TimeOnly(toHour, 0)));
     }
 
@@ -90,7 +90,7 @@ public sealed class EnumerationTests
     public void TradeDirection_TryParse_Accepts_BuyAndSell(string value, TradeDirectionValue direction)
     {
         TradeDirection.TryParse(value, out var tradeDirection).ShouldBeTrue();
-        tradeDirection!.Value.ShouldBe(direction);
+        tradeDirection.Value.ShouldBe(direction);
     }
 
     [Theory]

@@ -11,6 +11,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL"/>
         <PackageReference Include="EFCore.NamingConventions"/>
+        <PackageReference Include="Marten"/>
         <!-- dotnet ef migrations add runs against this project (DealsDbContextFactory). -->
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>

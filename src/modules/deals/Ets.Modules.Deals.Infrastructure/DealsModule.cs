@@ -1,7 +1,10 @@
 using Ets.Modules.Deals.Application;
+using Ets.Modules.Deals.Domain.Repositories;
 using Ets.Modules.Deals.Domain.Services;
+using Ets.Modules.Deals.Infrastructure.EventStore;
 using Ets.Modules.Deals.Infrastructure.Persistence;
 using Ets.Modules.Deals.Infrastructure.Products;
+using Marten;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +28,10 @@ public static class DealsModule
     ///     Host configuration. Each adapter binds its own named section (<c>SectionName</c>, ADR-0005).
     /// </param>
     /// <returns>The same service collection for method chaining.</returns>
+    /// <remarks>
+    ///     The event store runs on the host's shared <c>NpgsqlDataSource</c>, which the host registers with
+    ///     Aspire's <c>AddNpgsqlDataSource</c>.
+    /// </remarks>
     public static IServiceCollection AddDealsModule(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -37,6 +44,11 @@ public static class DealsModule
         services.AddDbContext<DealsDbContext>(options => DealsDbContext.Configure(options, connectionString));
 
         services.AddScoped<IAsxProductCatalogue, AsxProductCatalogue>();
+
+        services.AddMartenStore<IDealsStore>(DealsEventStore.Configure);
+        services.AddScoped<DealsEventSession>();
+        services.AddScoped<IExchangeDealRepository, ExchangeDealRepository>();
+        services.AddScoped<IDealsUnitOfWork, DealsUnitOfWork>();
 
         return services;
     }
