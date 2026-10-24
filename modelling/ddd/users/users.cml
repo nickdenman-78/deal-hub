@@ -1,0 +1,169 @@
+import "../shared/shared.cml"
+
+ContextMap Identity {
+	contains IdentityContext
+	contains SharedContext
+
+	IdentityContext [SK]<->[SK] SharedContext
+}
+
+BoundedContext IdentityContext {
+	type = APPLICATION
+
+	/*
+	 * Who may do what in ETS. Keycloak proves who a caller is; this context decides what they may do. Users
+	 * hold roles, roles grant permissions, and every module declares the permissions its endpoints check
+	 * (ADR-0006).
+	 */
+	Module Users {
+
+		ValueObject UserId {
+			Guid id
+		}
+
+		ValueObject RoleId {
+			Guid id
+		}
+
+		/* The subject (sub claim) Keycloak issues for a person. Never blank. */
+		ValueObject IdentityId {
+			String value
+		}
+
+		/* What a module lets a caller do, as module:action (deals:capture). Lower case, kebab-case action. */
+		ValueObject Permission {
+			String value
+		}
+
+		/* The name people know a role by, such as Trader. Never blank. */
+		ValueObject RoleName {
+			String value
+		}
+
+		/* A role held by a user, and when it was assigned. */
+		ValueObject RoleAssignment {
+			- @RoleId roleId
+			DateTime assignedAt
+		}
+
+		Aggregate Role {
+
+			/*
+			 * A named set of permissions, such as Trader.
+			 * Invariants:
+			 *   - the name is not blank, and no two roles share a name
+			 *   - a permission is granted to a role at most once
+			 */
+			Entity Role {
+				aggregateRoot
+
+				/* Properties */
+				- @RoleId id
+				- @RoleName name
+				- List<@Permission> permissions
+
+				/* Behaviour */
+				def @Role create(@RoleName name, List<@Permission> permissions);
+				def void grant(@Permission permission);
+				def void revoke(@Permission permission);
+			}
+
+			/* Create a role with a unique name, granting a set of permissions. */
+			CommandEvent CreateRole {
+				- @RoleName name
+				- List<@Permission> permissions
+			}
+
+			/* Grant a role one more permission. */
+			CommandEvent GrantPermission {
+				- @RoleId roleId
+				- @Permission permission
+			}
+
+			/* Revoke a permission from a role. */
+			CommandEvent RevokePermission {
+				- @RoleId roleId
+				- @Permission permission
+			}
+
+			DomainEvent RoleCreated {
+				- @RoleId roleId
+				- @RoleName name
+				- List<@Permission> permissions
+				DateTime occurredAt
+			}
+
+			DomainEvent PermissionGranted {
+				- @RoleId roleId
+				- @Permission permission
+				DateTime occurredAt
+			}
+
+			DomainEvent PermissionRevoked {
+				- @RoleId roleId
+				- @Permission permission
+				DateTime occurredAt
+			}
+		}
+
+		Aggregate User {
+
+			/*
+			 * A person who uses ETS, known by their Keycloak identity.
+			 * Invariants:
+			 *   - no two users share an identity
+			 *   - a role is assigned to a user at most once
+			 */
+			Entity User {
+				aggregateRoot
+
+				/* Properties */
+				- @UserId id
+				- @IdentityId identityId
+				String userName
+				- List<@RoleAssignment> roleAssignments
+
+				/* Behaviour */
+				def @User register(@IdentityId identityId, String userName);
+				def void assignRole(@RoleId roleId);
+				def void unassignRole(@RoleId roleId);
+			}
+
+			/* Register a person who already exists in Keycloak as an ETS user, holding no roles. */
+			CommandEvent RegisterUser {
+				- @IdentityId identityId
+				String userName
+			}
+
+			/* Give a user an existing role. */
+			CommandEvent AssignRole {
+				- @UserId userId
+				- @RoleId roleId
+			}
+
+			/* Take a role away from a user. */
+			CommandEvent UnassignRole {
+				- @UserId userId
+				- @RoleId roleId
+			}
+
+			DomainEvent UserRegistered {
+				- @UserId userId
+				- @IdentityId identityId
+				DateTime occurredAt
+			}
+
+			DomainEvent RoleAssigned {
+				- @UserId userId
+				- @RoleId roleId
+				DateTime occurredAt
+			}
+
+			DomainEvent RoleUnassigned {
+				- @UserId userId
+				- @RoleId roleId
+				DateTime occurredAt
+			}
+		}
+	}
+}

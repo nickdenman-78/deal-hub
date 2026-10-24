@@ -37,8 +37,9 @@
     <!-- OpenAPI reference UI (Scalar, not Swagger UI). -->
     <PackageVersion Include="Scalar.AspNetCore" Version="2.16.17" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.13" />
-    <!-- Transitive pin: Microsoft.Data.Sqlite pulls vulnerable lib.e_sqlite3 2.1.11 (GHSA-2m69-gcr7-jv3q). -->
-    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12" />
+    <!-- Transitive pin: Microsoft.Data.Sqlite pulls vulnerable lib.e_sqlite3 2.1.11 (GHSA-2m69-gcr7-jv3q).
+         Kept at or above the version Microsoft.EntityFrameworkCore.Sqlite brings in, or restore fails with NU1109. -->
+    <PackageVersion Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.13" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.13" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />

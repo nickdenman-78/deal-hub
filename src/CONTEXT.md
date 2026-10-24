@@ -94,8 +94,8 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
 - **`DealsDbContext` does not use the shared data source.** It reads `ConnectionStrings:ets` with
   `UseNpgsql`, while the Marten store uses the host's `NpgsqlDataSource`, so the two hold separate pools.
 - **The local Keycloak realm is a starter.** `Realms/ets-realm.json` declares the `ets-api` audience client, a
-  public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user — local only. The Users
-  module will provision real users.
+  public `ets-scalar` PKCE client with wildcard redirects, and one `trader` user with a fixed id — local
+  only. Nothing provisions Keycloak users from the Users module.
 - **A captured deal cannot be read back.** `POST /api/deals/asx-futures` captures a deal into its Marten
   stream, but there is no projection, no repository load and no read route; the `Location` it returns names
   a route that does not exist yet.
@@ -107,16 +107,19 @@ Current shape that is incomplete, phrased as the shape ("X has a handler but no 
   and updating `deals_events` objects at runtime; nothing applies them ahead of a deployment.
 - **The ASX product catalogue is empty.** `deals.asx_products` backs `IAsxProductCatalogue`, but nothing loads
   ASX's contract size schedule into it, so every product code is reported as not listed.
-- **Permission claims are not populated.** `AddCoreAuthorization` declares one policy per permission and
-  each requires a `permission` claim, but no `IClaimsTransformation` adds those claims — it depends on the
-  Users module's `IUserPermissionsQuery`, which does not exist. Until it does, every permission policy
-  denies.
+- **Roles cannot be renamed or deleted, and users cannot be removed.** `/api/users` creates roles, grants
+  and revokes permissions, registers users and assigns or unassigns roles, but there is no rename, delete
+  or deactivate. Nothing stops an administrator unassigning their own `users:manage` role.
+- **Permission claims are looked up on every request.** `PermissionClaimsTransformation` queries
+  `users.*` once per authenticated request; there is no FusionCache entry and no invalidation.
+- **Granted permissions are not checked against the catalogues.** `Role.Grant` validates a permission's
+  shape only, so a role may hold a permission no module declares, which no policy will ever require.
 - **The kernel has no messaging, caching or scheduling helpers.** Wolverine, Marten, FusionCache and Quartz
   job registration is not in `Ets.Core.Infrastructure`; Quartz is referenced only to evaluate `CronSchedule`
   expressions (`QuartzCronScheduleEvaluator`).
 - **`Price` has no shared-kernel CML.** `modelling/ddd/shared/shared.cml` models every other kernel value
   object, but `Price` ($/MWh) exists only in `Ets.Core.Domain`.
-- **No integration test projects.** `EtsCoreTests` and `EtsDealsTests` hold unit tests of the kernel value
+- **No integration test projects.** `EtsCoreTests`, `EtsDealsTests` and `EtsUsersTests` hold unit tests of the kernel value
   objects, the Deals domain and the Deals event JSON; nothing yet runs against Testcontainers, so the Marten
   repository, unit of work and capture route are untested against a database.
 

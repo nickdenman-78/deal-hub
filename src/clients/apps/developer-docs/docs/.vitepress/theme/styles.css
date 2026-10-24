@@ -1,0 +1,52 @@
+@import '@ets/brand/tokens.css';
+@import '@ets/brand/scrollbars.css';
+
+:root {
+  --vp-font-family-base: 'IBM Plex Sans', sans-serif;
+  --vp-font-family-mono: 'IBM Plex Mono', monospace;
+}
+
+html {
+  overflow-y: scroll;
+}
+
+:root.dark img[src$='.svg'] {
+  filter: invert(1);
+}
+
+:root:not(.dark) img[src$='.svg'] {
+  filter: invert(0);
+}
+
+/* Image viewer is now opt-in via .zoomable class */
+/* Add a subtle visual indicator for zoomable images */
+img.zoomable {
+  cursor: zoom-in;
+  transition: opacity 0.2s ease;
+}
+
+img.zoomable:hover {
+  opacity: 0.9;
+}
+
+/* Base style for all custom blocks */
+.custom-block {
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Optional title styling */
+.custom-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+:root:not(.dark) .mxgraph,
+:root:not(.dark) .geDiagramContainer {
+  color-scheme: light !important;
+}

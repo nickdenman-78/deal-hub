@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Users module presentation: endpoints (one per slice), request/response contracts and the route-side composition root.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\core\Ets.Core.Presentation\Ets.Core.Presentation.csproj"/>
+        <ProjectReference Include="..\Ets.Modules.Users.Application\Ets.Modules.Users.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

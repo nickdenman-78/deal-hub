@@ -44,6 +44,13 @@ Captures deals, all in its `Deals` module. Its one aggregate so far is `Exchange
 `DealId`, whose `AsxFuturesDeal` subtype captures ASX electricity futures from a product code, direction,
 price and volume (`AsxFuturesDealCaptured`); `DealName` is the trader-facing name. It shares the kernel (`[SK]<->[SK] SharedContext`). Implemented in `src/modules/deals/` (event sourced).
 
+### IdentityContext (`users/users.cml`)
+
+Decides what each signed-in person may do, in its `Users` module. A `Role` is a named set of `Permission`s;
+a `User` is a Keycloak identity (`IdentityId`, the token's `sub`) holding `RoleAssignment`s. A user's
+permissions are the union of their roles' permissions. Implemented in `src/modules/users/` (EF Core, schema
+`users`).
+
 ## Rendering
 
 The Context Mapper VS Code extension renders context maps and PlantUML diagrams. A local PlantUML server

@@ -8,3 +8,6 @@ pnpm-lock.yaml
 # Agent skill references are vendored prose.
 .claude/
 .agents/
+
+# Archify diagrams are generated, self-contained HTML; regenerate them, never reformat them.
+apps/developer-docs/docs/public/diagrams/archify/

@@ -33,6 +33,11 @@
         <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.Infrastructure\Ets.Modules.Deals.Infrastructure.csproj"/>
         <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.IntegrationEvents\Ets.Modules.Deals.IntegrationEvents.csproj"/>
         <ProjectReference Include="..\..\..\src\modules\deals\Ets.Modules.Deals.Presentation\Ets.Modules.Deals.Presentation.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\users\Ets.Modules.Users.Domain\Ets.Modules.Users.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\users\Ets.Modules.Users.Application\Ets.Modules.Users.Application.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\users\Ets.Modules.Users.Infrastructure\Ets.Modules.Users.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\users\Ets.Modules.Users.IntegrationEvents\Ets.Modules.Users.IntegrationEvents.csproj"/>
+        <ProjectReference Include="..\..\..\src\modules\users\Ets.Modules.Users.Presentation\Ets.Modules.Users.Presentation.csproj"/>
         <!-- The host, for HostDependencyTests only: the layer rules range over core and module assemblies. -->
         <ProjectReference Include="..\..\..\src\hosts\Ets.Servers.Api\Ets.Servers.Api.csproj"/>
     </ItemGroup>

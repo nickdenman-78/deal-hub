@@ -1,5 +1,4 @@
 using System.Reflection;
-using ArchUnitNET.Fluent;
 using ArchUnitNET.Loader;
 using ArchUnitNET.xUnitV3;
 using EtsArchitectureTests.Abstractions;
@@ -15,6 +14,12 @@ namespace EtsArchitectureTests;
 ///     IntegrationEvents (the permission catalogue). Reaching a module's Application or Domain would let the host
 ///     bypass the module's own composition root.
 /// </summary>
+/// <remarks>
+///     <c>Program.cs</c> is top-level statements, which compile into a generated <c>Program.&lt;Main&gt;$</c>
+///     that ArchUnitNET does not analyse, so a rule over the host's types never sees the composition calls. The
+///     compiler records an assembly reference only for an assembly whose code the host actually uses, so the
+///     host's references are checked as well.
+/// </remarks>
 public sealed class HostDependencyTests
 {
     private static readonly Assembly Host = typeof(Ets.Servers.Api.IApiMarker).Assembly;
@@ -30,6 +35,13 @@ public sealed class HostDependencyTests
     {
         var module = EtsModules.Named(moduleName);
 
+        ReferencedAssemblyNames().ShouldNotContain(
+            module.Domain.GetName().Name,
+            $"The host uses {module.Name}.Domain directly.");
+        ReferencedAssemblyNames().ShouldNotContain(
+            module.Application.GetName().Name,
+            $"The host uses {module.Name}.Application directly.");
+
         Types().That().ResideInAssembly(Host)
             .Should().NotDependOnAny(TypesInNamespaces(module.DomainNamespace, module.ApplicationNamespace))
             .Because($"the host reaches {module.Name} only through its Infrastructure, Presentation and " +
@@ -42,19 +54,22 @@ public sealed class HostDependencyTests
     {
         // The positive half: a module that is referenced but never composed is dead weight, and one that is
         // composed must be reached through both halves of its composition root.
+        string?[] referenced = ReferencedAssemblyNames();
+
         foreach (var module in EtsModules.All)
         {
-            IArchRule rule = Types().That().ResideInAssembly(Host)
-                .Should().NotDependOnAny(TypesInNamespaces(module.InfrastructureNamespace));
-
-            rule.HasNoViolations(HostArchitecture).ShouldBeFalse(
+            referenced.ShouldContain(
+                module.Infrastructure.GetName().Name,
                 $"The host does not call Add{module.Name}Module — {module.Name} is referenced but not composed.");
 
-            rule = Types().That().ResideInAssembly(Host)
-                .Should().NotDependOnAny(TypesInNamespaces(module.PresentationNamespace));
-
-            rule.HasNoViolations(HostArchitecture).ShouldBeFalse(
+            referenced.ShouldContain(
+                module.Presentation.GetName().Name,
                 $"The host does not call Add{module.Name}Endpoints / Map{module.Name}Module.");
         }
+    }
+
+    private static string?[] ReferencedAssemblyNames()
+    {
+        return [.. Host.GetReferencedAssemblies().Select(reference => reference.Name)];
     }
 }

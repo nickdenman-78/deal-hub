@@ -33,9 +33,9 @@ control, and they cannot be run locally or in tests.
   ```
 
 - **The host registers one policy per declared permission** from every module's `All` list. There is **no
-  dynamic policy provider** — the reason ADR-0006 gave still holds: a synthesised policy turns a typo into a
-  permissive route. The authorization set stays enumerable at startup, and an endpoint naming an unknown
-  permission fails startup.
+  dynamic policy provider**: a synthesised policy turns a typo into a permissive route. The authorization set
+  stays enumerable at startup, and an endpoint naming an undeclared permission fails the first time its policy
+  is evaluated.
 - **An `IClaimsTransformation`** resolves the caller's permissions from the Users module's published query
   (`IUserPermissionsQuery` in `Users.IntegrationEvents`) and adds `permission` claims. Results are cached
   in FusionCache keyed by identity id and invalidated by the Users module's role-change events.

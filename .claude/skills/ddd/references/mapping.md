@@ -12,6 +12,7 @@ before creating anything, and add a row when a new context is modelled.
 | `DealCaptureContext` | Core | `src/modules/deals/` | `Ets.Modules.Deals.*` |
 | `SettlementContext` | Core / supporting | `src/modules/settlement/` | `Ets.Modules.Settlement.*` |
 | `RiskContext` | Core | `src/modules/risk/` | `Ets.Modules.Risk.*` |
+| `IdentityContext` | Generic | `src/modules/users/` | `Ets.Modules.Users.*` |
 | _new_ `{Name}Context` | — | `src/modules/{name}/` | `Ets.Modules.{Name}.*` |
 
 The rows below `SharedContext` are proposed from the product scope; confirm each when its CML exists.

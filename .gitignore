@@ -419,3 +419,11 @@ FodyWeavers.xsd
 
 # JetBrains IDEs
 .idea/
+
+# Local migration connection strings (hold the database password)
+appsettings.Migrations.local.json
+
+# Archify working folders (candidates, delivery receipts, browser evidence)
+.archify/
+# The vendored Archify skill keeps its CLI in bin/
+!.claude/skills/archify/bin/*

@@ -39,6 +39,10 @@
     <File Path="modelling/ddd/deals/deals.cml" />
     <File Path="modelling/ddd/deals/ubiquitous.md" />
   </Folder>
+  <Folder Name="/modelling/ddd/users/">
+    <File Path="modelling/ddd/users/users.cml" />
+    <File Path="modelling/ddd/users/ubiquitous.md" />
+  </Folder>
   <Folder Name="/modelling/ddd/shared/">
     <File Path="modelling/ddd/shared/shared.cml" />
     <File Path="modelling/ddd/shared/ubiquitous.md" />
@@ -67,6 +71,13 @@
     <Project Path="src/modules/deals/Ets.Modules.Deals.IntegrationEvents/Ets.Modules.Deals.IntegrationEvents.csproj" />
     <Project Path="src/modules/deals/Ets.Modules.Deals.Presentation/Ets.Modules.Deals.Presentation.csproj" />
   </Folder>
+  <Folder Name="/src/modules/users/">
+    <Project Path="src/modules/users/Ets.Modules.Users.Domain/Ets.Modules.Users.Domain.csproj" />
+    <Project Path="src/modules/users/Ets.Modules.Users.Application/Ets.Modules.Users.Application.csproj" />
+    <Project Path="src/modules/users/Ets.Modules.Users.Infrastructure/Ets.Modules.Users.Infrastructure.csproj" />
+    <Project Path="src/modules/users/Ets.Modules.Users.IntegrationEvents/Ets.Modules.Users.IntegrationEvents.csproj" />
+    <Project Path="src/modules/users/Ets.Modules.Users.Presentation/Ets.Modules.Users.Presentation.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
   </Folder>
@@ -79,5 +90,8 @@
   <Folder Name="/tests/modules/" />
   <Folder Name="/tests/modules/deals/">
     <Project Path="tests/modules/deals/EtsDealsTests/EtsDealsTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/modules/users/">
+    <Project Path="tests/modules/users/EtsUsersTests/EtsUsersTests.csproj" />
   </Folder>
 </Solution>

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Ets.Core.Domain.ValueObjects;
 using Ets.Modules.Deals.Domain.ValueObjects;
 
@@ -44,6 +45,19 @@ public sealed class ProductCodeTests
         productCode.ExpiryYear.ShouldBe(2026);
         productCode.Term.StartDate.ShouldBe(new DateOnly(2026, 1, 1));
         productCode.Term.EndDate.ShouldBe(new DateOnly(2026, 3, 31));
+    }
+
+    [Theory]
+    [InlineData("ENF27", "2027-01-01", "2027-01-31")]
+    [InlineData("BNH26", "2026-01-01", "2026-03-31")]
+    [InlineData("HNZ26", "2027-01-01", "2027-12-31")]
+    [InlineData("HNM26", "2026-07-01", "2027-06-30")]
+    public void Create_Spans_WholeMonths(string code, string start, string end)
+    {
+        var term = ProductCode.Create(code).Value.Term;
+
+        term.StartDate.ShouldBe(DateOnly.Parse(start, CultureInfo.InvariantCulture));
+        term.EndDate.ShouldBe(DateOnly.Parse(end, CultureInfo.InvariantCulture));
     }
 
     [Fact]

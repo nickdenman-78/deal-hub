@@ -21,7 +21,7 @@ const clientsRoot = resolve(here, '../../..');
 const logoFiles = ['ets-logo.svg', 'ets-logo-neg.svg', 'ets-mark.svg'] as const;
 const faviconFiles = ['favicon.svg', 'favicon.png', 'apple-touch-icon.png'] as const;
 
-const appPublicDirs = ['apps/ets/public'] as const;
+const appPublicDirs = ['apps/ets/public', 'apps/developer-docs/docs/public'] as const;
 
 function sha256(path: string): string {
   return createHash('sha256').update(readFileSync(path)).digest('hex');

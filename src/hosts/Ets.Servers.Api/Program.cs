@@ -9,12 +9,17 @@ using Ets.Core.Presentation.Middleware;
 using Ets.Modules.Deals.Infrastructure;
 using Ets.Modules.Deals.IntegrationEvents.Authorization;
 using Ets.Modules.Deals.Presentation;
+using Ets.Modules.Users.Infrastructure;
+using Ets.Modules.Users.IntegrationEvents.Authorization;
+using Ets.Modules.Users.Presentation;
 using Ets.Servers.Api.Authentication;
 using Ets.Servers.Api.Logging;
 using Ets.Servers.Api.OpenApi;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
+using DealsOpenApi = Ets.Modules.Deals.Presentation.OpenApiDocuments;
+using UsersOpenApi = Ets.Modules.Users.Presentation.OpenApiDocuments;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,11 +58,20 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 const string hostOpenApiDocument = "host";
 
 builder.Services.AddOpenApi(
-    OpenApiDocuments.Deals,
+    DealsOpenApi.Deals,
     options =>
     {
-        options.ShouldInclude = description => description.GroupName == OpenApiDocuments.Deals;
-        options.OrderTags(OpenApiDocuments.DealsTagOrder);
+        options.ShouldInclude = description => description.GroupName == DealsOpenApi.Deals;
+        options.OrderTags(DealsOpenApi.DealsTagOrder);
+        options.AddKeycloakOAuth2(builder.Configuration);
+    });
+
+builder.Services.AddOpenApi(
+    UsersOpenApi.Users,
+    options =>
+    {
+        options.ShouldInclude = description => description.GroupName == UsersOpenApi.Users;
+        options.OrderTags(UsersOpenApi.UsersTagOrder);
         options.AddKeycloakOAuth2(builder.Configuration);
     });
 
@@ -81,7 +95,7 @@ builder.Services.AddKeycloakAuthentication(builder.Configuration);
 
 // One declared policy per permission, assembled from each module's published catalogue. No dynamic policy
 // provider, and no switch that disables authorization.
-builder.Services.AddCoreAuthorization(DealsPermissions.All);
+builder.Services.AddCoreAuthorization([.. DealsPermissions.All, .. UsersPermissions.All]);
 
 // ---- Kernel -------------------------------------------------------------------------------------------------
 
@@ -103,6 +117,13 @@ builder.Services
         DealsPermissions.Read,
         DealsPermissions.Capture,
         DealsPermissions.Confirm));
+
+// Users also supplies every caller's permission claims, from the roles assigned to them (ADR-0006).
+builder.Services
+    .AddUsersModule(builder.Configuration)
+    .AddUsersEndpoints(new UsersAuthorizationPolicies(
+        UsersPermissions.Read,
+        UsersPermissions.Manage));
 
 // After every module: the CQRS decorators are open-generic and wrap whatever handlers are registered at this
 // point, so registering them earlier would miss some and double-wrap others (ADR-0008).
@@ -132,7 +153,8 @@ if (app.Environment.IsDevelopment())
     // Scalar does not discover documents; every document registered above must be named here as well.
     app.MapScalarApiReference(options =>
     {
-        options.AddDocument(OpenApiDocuments.Deals);
+        options.AddDocument(DealsOpenApi.Deals);
+        options.AddDocument(UsersOpenApi.Users);
         options.AddDocument(hostOpenApiDocument);
         options.AddKeycloakSignIn(app.Configuration);
     });
@@ -142,6 +164,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapDealsModule();
+app.MapUsersModule();
 
 // Who the caller is and what they may do. The SPA reads its permissions here, never by decoding a token
 // (ADR-0006). UX only: nothing here grants anything — every endpoint enforces its own permission policy.

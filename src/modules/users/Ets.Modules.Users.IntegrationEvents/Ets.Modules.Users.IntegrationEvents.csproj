@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- The Users module's public API: the only project other modules and the host may reference.
+         Holds versioned integration event contracts, read-side queries, the permission catalogue and
+         configuration contracts.
+
+         It must stay reference-light: no kernel, Wolverine or Marten types. Anything added here becomes
+         part of the module's contract, and any dependency added here is one every consumer inherits.
+         Architecture tests enforce that it depends on no other layer of this module. -->
+
+    <PropertyGroup>
+        <Description>Users module public API: the user permissions query and permission names.</Description>
+    </PropertyGroup>
+
+</Project>

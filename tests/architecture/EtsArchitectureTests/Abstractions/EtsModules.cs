@@ -11,7 +11,6 @@ internal static class EtsModules
     [
         "Settlement",
         "Risk",
-        "Users",
         "MarketData",
         "Counterparties"
     ];
@@ -25,7 +24,16 @@ internal static class EtsModules
         Ets.Modules.Deals.IntegrationEvents.AssemblyReference.Assembly,
         Ets.Modules.Deals.Presentation.AssemblyReference.Assembly);
 
-    internal static readonly EtsModule[] All = [Deals];
+    internal static readonly EtsModule Users = new(
+        "Users",
+        false,
+        Ets.Modules.Users.Domain.AssemblyReference.Assembly,
+        Ets.Modules.Users.Application.AssemblyReference.Assembly,
+        Ets.Modules.Users.Infrastructure.AssemblyReference.Assembly,
+        Ets.Modules.Users.IntegrationEvents.AssemblyReference.Assembly,
+        Ets.Modules.Users.Presentation.AssemblyReference.Assembly);
+
+    internal static readonly EtsModule[] All = [Deals, Users];
 
     /// <summary>Theory data: one row per built module.</summary>
     internal static TheoryData<string> Names => new(All.Select(m => m.Name));

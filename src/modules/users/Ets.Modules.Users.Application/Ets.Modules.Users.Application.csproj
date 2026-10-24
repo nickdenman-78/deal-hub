@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Users module application layer: use cases (commands, queries, handlers), their validators, and the ports the module's adapters implement.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\core\Ets.Core.Domain\Ets.Core.Domain.csproj"/>
+        <ProjectReference Include="..\Ets.Modules.Users.Domain\Ets.Modules.Users.Domain.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+    </ItemGroup>
+
+</Project>

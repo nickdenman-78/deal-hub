@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- xUnit v3, Shouldly and the test SDK come from tests/Directory.Build.props. -->
+
+    <PropertyGroup>
+        <RootNamespace>EtsUsersTests</RootNamespace>
+        <AssemblyName>EtsUsersTests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Shouldly"/>
+    </ItemGroup>
+
+    <!-- SQLite in memory runs the EF Core mapping and the permissions query without a PostgreSQL container. -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\src\modules\users\Ets.Modules.Users.Domain\Ets.Modules.Users.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\..\src\modules\users\Ets.Modules.Users.Application\Ets.Modules.Users.Application.csproj"/>
+        <ProjectReference Include="..\..\..\..\src\modules\users\Ets.Modules.Users.Infrastructure\Ets.Modules.Users.Infrastructure.csproj"/>
+        <ProjectReference Include="..\..\..\..\src\core\Ets.Core.Application\Ets.Core.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

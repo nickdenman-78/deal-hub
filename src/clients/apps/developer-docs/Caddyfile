@@ -1,0 +1,30 @@
+:80 {
+	root * /usr/share/caddy
+	encode zstd gzip
+	file_server
+
+	# SPA-style fallback: serve index.html for unknown paths
+	try_files {path} {path}/ /index.html
+
+	# Security headers (HSTS is only effective over HTTPS/behind TLS termination)
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer-when-downgrade"
+	}
+
+	# Caching: long cache for static assets, disable for HTML
+	@static {
+		path *.css *.js *.png *.jpg *.jpeg *.gif *.svg *.webp *.ico *.woff *.woff2 *.ttf *.eot
+	}
+	@html {
+		path *.html
+	}
+	header @static Cache-Control "public, max-age=31536000, immutable"
+	header @html Cache-Control "no-cache"
+
+	# In case of 404 (or other errors), fall back to index.html (for SPAs)
+	handle_errors {
+		rewrite * /index.html
+		file_server
+	}
+}

@@ -73,16 +73,20 @@ public sealed record ProductCode : IValueObject
         int expiryYear = 2000 + twoDigitYear;
         var expiry = new DateOnly(expiryYear, expiryMonth.Month, 1);
 
+        // Term.Create keeps the dates it is given (it only aligns them to name the term), so every term ends on
+        // the last day of its final month.
+        var expiryMonthEnd = expiry.AddMonths(1).AddDays(-1);
+
         return commodityCode.Period.Value switch
         {
             ContractPeriodValue.Month => new ProductCode(code, commodityCode, expiryMonth, expiryYear,
-                Term.Create(expiry, expiry)),
+                Term.Create(expiry, expiryMonthEnd)),
             ContractPeriodValue.Quarter when expiryMonth.Month % 3 == 0 => new ProductCode(code, commodityCode,
-                expiryMonth, expiryYear, Term.Create(expiry.AddMonths(-2), expiry)),
+                expiryMonth, expiryYear, Term.Create(expiry.AddMonths(-2), expiryMonthEnd)),
             ContractPeriodValue.Quarter => Invalid(value, "a quarter contract expires in H, M, U or Z"),
             ContractPeriodValue.Strip when expiryMonth.Value is ContractMonthValue.Dec or ContractMonthValue.Jun =>
                 new ProductCode(code, commodityCode, expiryMonth, expiryYear,
-                    Term.Create(expiry.AddMonths(1), expiry.AddMonths(12))),
+                    Term.Create(expiry.AddMonths(1), expiryMonthEnd.AddMonths(12))),
             ContractPeriodValue.Strip => Invalid(value, "a strip expires in M (financial year) or Z (calendar year)"),
             _ => throw new InvalidOperationException($"Unmapped contract period '{commodityCode.Period}'.")
         };
