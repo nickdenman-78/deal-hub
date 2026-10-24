@@ -5,6 +5,10 @@ on this site, and they are the source of truth for _why_ the code looks the way 
 
 ## The architecture
 
+For a guided tour first, read the [Architecture](../architecture/) section of this site: the modules and their
+layers, the host, the shared kernel, one request traced end to end, and a summary of every ADR. Then the documents it
+summarises:
+
 | Read                                | For                                                                          |
 | ----------------------------------- | ---------------------------------------------------------------------------- |
 | `docs/architecture/architecture.md` | The modules, the host, the shape of a module and the architecture tests      |

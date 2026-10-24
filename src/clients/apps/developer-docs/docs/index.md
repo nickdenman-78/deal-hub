@@ -9,4 +9,7 @@ hero:
     - theme: brand
       text: Get started
       link: /getting-started/
+    - theme: alt
+      text: Architecture
+      link: /architecture/
 ---

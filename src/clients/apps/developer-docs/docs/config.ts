@@ -10,7 +10,10 @@ export const footer: DefaultTheme.Footer = {
   message: `${pkg.description} version ${pkg.version}`,
 };
 
-export const nav: DefaultTheme.NavItem[] = [{ text: 'Getting started', link: '/getting-started/' }];
+export const nav: DefaultTheme.NavItem[] = [
+  { text: 'Getting started', link: '/getting-started/' },
+  { text: 'Architecture', link: '/architecture/' },
+];
 
 export const sidebar: DefaultTheme.Sidebar = {
   '/getting-started/': [
@@ -27,6 +30,24 @@ export const sidebar: DefaultTheme.Sidebar = {
         { text: 'The developer docs site', link: '/getting-started/developer-docs' },
         { text: 'Troubleshooting', link: '/getting-started/troubleshooting' },
         { text: 'Next steps', link: '/getting-started/next-steps' },
+      ],
+    },
+  ],
+  '/architecture/': [
+    {
+      text: 'Architecture',
+      items: [
+        { text: 'Overview', link: '/architecture/' },
+        { text: 'Modules and layers', link: '/architecture/modules' },
+        { text: 'The host', link: '/architecture/host' },
+        { text: 'The shared kernel', link: '/architecture/kernel' },
+        { text: 'A request, end to end', link: '/architecture/request-lifecycle' },
+        { text: 'Persistence and event sourcing', link: '/architecture/persistence' },
+        { text: 'Messaging, caching and scheduling', link: '/architecture/messaging-caching-scheduling' },
+        { text: 'Security', link: '/architecture/security' },
+        { text: 'Observability', link: '/architecture/observability' },
+        { text: 'Testing', link: '/architecture/testing' },
+        { text: 'Decision records', link: '/architecture/decisions' },
       ],
     },
   ],

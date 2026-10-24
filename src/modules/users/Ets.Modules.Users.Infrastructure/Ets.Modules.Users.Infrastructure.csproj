@@ -23,6 +23,9 @@
     <ItemGroup>
         <None Update="appsettings.Migrations.json" CopyToOutputDirectory="PreserveNewest"/>
         <None Update="appsettings.Migrations.local.json" CopyToOutputDirectory="PreserveNewest"/>
+        <None Update="appsettings.Migrations.local.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <!-- Deliberately does NOT reference Presentation: the route-side composition root lives there, so

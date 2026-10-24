@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ETS host composition and runtime dependencies",
+    "output": ".archify/architecture-ets-host-20261024-161103/ets-host.html",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/nickdenman-78/deal-hub.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "04f9a3ef17a3566ee15390c91a316cf7d46049aa"
+    }
+  },
+  "components": [
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "ETS web app",
+      "sublabel": "Vue 3 SPA @ets/app-ets",
+      "pos": [40, 300],
+      "size": [160, 64],
+      "sources": [
+        {
+          "path": "src/clients/apps/ets/src/api/client.ts",
+          "line": 14,
+          "end_line": 25,
+          "label": "Bearer token on API calls"
+        },
+        { "path": "src/clients/apps/ets/src/api/me.ts", "line": 3, "end_line": 11, "label": "GET /api/me" }
+      ]
+    },
+    {
+      "id": "keycloak",
+      "type": "security",
+      "label": "Keycloak",
+      "sublabel": "realm ets",
+      "tag": "OIDC + JWT",
+      "pos": [310, 40],
+      "size": [180, 64],
+      "sources": [
+        {
+          "path": "src/aspire/Ets.Aspire.AppHost/AppHost.cs",
+          "line": 22,
+          "end_line": 30,
+          "label": "Keycloak container"
+        },
+        { "path": "src/clients/apps/ets/src/auth/oidc.ts", "line": 1, "end_line": 20, "label": "PKCE client ets-web" }
+      ]
+    },
+    {
+      "id": "host",
+      "type": "backend",
+      "label": "API host",
+      "sublabel": "Ets.Servers.Api",
+      "tag": "composition root",
+      "pos": [310, 190],
+      "size": [180, 290],
+      "sources": [
+        {
+          "path": "src/hosts/Ets.Servers.Api/Program.cs",
+          "line": 92,
+          "end_line": 130,
+          "label": "auth, kernel, modules, pipeline"
+        },
+        {
+          "path": "src/hosts/Ets.Servers.Api/Program.cs",
+          "line": 134,
+          "end_line": 167,
+          "label": "middleware and routes"
+        },
+        {
+          "path": "src/hosts/Ets.Servers.Api/Authentication/ServiceCollectionExtensions.cs",
+          "line": 23,
+          "end_line": 57,
+          "label": "JWT bearer validation"
+        }
+      ]
+    },
+    {
+      "id": "deals",
+      "type": "backend",
+      "label": "Deals module",
+      "sublabel": "/api/deals",
+      "tag": "event sourced",
+      "pos": [650, 160],
+      "size": [170, 150],
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/DealsModule.cs",
+          "line": 35,
+          "end_line": 54,
+          "label": "AddDealsModule"
+        },
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Presentation/DealsEndpoints.cs",
+          "line": 47,
+          "end_line": 61,
+          "label": "MapDealsModule"
+        }
+      ]
+    },
+    {
+      "id": "users",
+      "type": "backend",
+      "label": "Users module",
+      "sublabel": "/api/users",
+      "tag": "permission claims",
+      "pos": [650, 390],
+      "size": [170, 80],
+      "sources": [
+        {
+          "path": "src/modules/users/Ets.Modules.Users.Infrastructure/UsersModule.cs",
+          "line": 37,
+          "end_line": 64,
+          "label": "AddUsersModule"
+        },
+        {
+          "path": "src/modules/users/Ets.Modules.Users.Infrastructure/Authorization/PermissionClaimsTransformation.cs",
+          "line": 22,
+          "end_line": 56,
+          "label": "claims transformation"
+        }
+      ]
+    },
+    {
+      "id": "dealsEvents",
+      "type": "database",
+      "label": "deals_events",
+      "sublabel": "Marten event streams",
+      "pos": [960, 150],
+      "size": [160, 60],
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/EventStore/DealsEventStore.cs",
+          "line": 15,
+          "end_line": 40,
+          "label": "ancillary Marten store"
+        },
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/EventStore/DealsUnitOfWork.cs",
+          "line": 22,
+          "end_line": 59,
+          "label": "start or append stream"
+        }
+      ]
+    },
+    {
+      "id": "dealsSchema",
+      "type": "database",
+      "label": "deals",
+      "sublabel": "EF Core: asx_products",
+      "pos": [960, 260],
+      "size": [160, 60],
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/Persistence/DealsDbContext.cs",
+          "line": 9,
+          "end_line": 52,
+          "label": "DealsDbContext"
+        }
+      ]
+    },
+    {
+      "id": "usersSchema",
+      "type": "database",
+      "label": "users",
+      "sublabel": "EF Core: users, roles",
+      "pos": [960, 400],
+      "size": [160, 60],
+      "sources": [
+        {
+          "path": "src/modules/users/Ets.Modules.Users.Infrastructure/Persistence/UsersDbContext.cs",
+          "line": 9,
+          "end_line": 53,
+          "label": "UsersDbContext"
+        }
+      ]
+    },
+    {
+      "id": "seq",
+      "type": "external",
+      "label": "Seq",
+      "sublabel": "Serilog sink",
+      "pos": [230, 570],
+      "size": [150, 60],
+      "sources": [
+        {
+          "path": "src/hosts/Ets.Servers.Api/Program.cs",
+          "line": 30,
+          "end_line": 48,
+          "label": "Serilog to console and Seq"
+        }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "type": "external",
+      "label": "Aspire dashboard",
+      "sublabel": "OTLP logs, traces, metrics",
+      "pos": [430, 570],
+      "size": [170, 60],
+      "sources": [
+        {
+          "path": "src/aspire/Ets.Aspire.ServiceDefaults/ServiceDefaultsExtensions.cs",
+          "line": 72,
+          "end_line": 102,
+          "label": "OpenTelemetry"
+        },
+        {
+          "path": "src/aspire/Ets.Aspire.ServiceDefaults/ServiceDefaultsExtensions.cs",
+          "line": 130,
+          "end_line": 143,
+          "label": "OTLP exporter when configured"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "One process: Ets.Servers.Api", "wraps": ["host", "deals", "users"] },
+    {
+      "kind": "region",
+      "label": "PostgreSQL database ets, schema per module",
+      "wraps": ["dealsEvents", "dealsSchema", "usersSchema"]
+    }
+  ],
+  "connections": [
+    { "id": "spa-signin", "from": "spa", "to": "keycloak", "label": "sign in (PKCE)", "variant": "security" },
+    { "id": "spa-api", "from": "spa", "to": "host", "label": "HTTPS + JWT", "variant": "emphasis" },
+    {
+      "id": "keycloak-host",
+      "from": "keycloak",
+      "to": "host",
+      "label": "issuer + signing keys",
+      "variant": "security"
+    },
+    { "id": "host-deals", "from": "host", "to": "deals", "label": "deals:* policies", "variant": "emphasis" },
+    { "id": "host-users", "from": "host", "to": "users", "label": "users:* + claims" },
+    { "id": "deals-events", "from": "deals", "to": "dealsEvents", "label": "append events", "variant": "emphasis" },
+    { "id": "deals-reference", "from": "deals", "to": "dealsSchema", "label": "product lookup" },
+    { "id": "users-store", "from": "users", "to": "usersSchema", "label": "EF Core" },
+    { "id": "host-seq", "from": "host", "to": "seq", "label": "logs", "variant": "dashed" },
+    { "id": "host-dashboard", "from": "host", "to": "dashboard", "label": "OTLP", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Composition",
+      "items": [
+        "Three lines per module: Add{Module}Module, Add{Module}Endpoints, Map{Module}Module",
+        "AddMediatorPipeline once, after every module",
+        "One OpenAPI document per module, plus host"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Authorization",
+      "items": [
+        "Keycloak authenticates; the host only validates tokens",
+        "Users turns roles into permission claims on every request",
+        "One declared policy per permission; each endpoint names its own"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Provisioned but unused",
+      "items": [
+        "The AppHost passes Redis and RabbitMQ to the host, but no client is registered",
+        "No Wolverine outbox: Deals publishes no integration event"
+      ]
+    }
+  ]
+}

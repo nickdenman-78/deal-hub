@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Capturing an ASX futures deal: one request through the layers",
+    "output": ".archify/sequence-capture-asx-futures-deal-20261024-162000/capture-asx-futures-deal.html",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/nickdenman-78/deal-hub.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "04f9a3ef17a3566ee15390c91a316cf7d46049aa"
+    }
+  },
+  "participants": [
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "ETS web app",
+      "sublabel": "fetch with Bearer",
+      "sources": [
+        {
+          "path": "src/clients/apps/ets/src/api/client.ts",
+          "line": 14,
+          "end_line": 25
+        }
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "Host auth",
+      "sublabel": "JWT + permission claims",
+      "sources": [
+        {
+          "path": "src/hosts/Ets.Servers.Api/Authentication/ServiceCollectionExtensions.cs",
+          "line": 23,
+          "end_line": 57,
+          "label": "JWT bearer validation"
+        },
+        {
+          "path": "src/modules/users/Ets.Modules.Users.Infrastructure/Authorization/PermissionClaimsTransformation.cs",
+          "line": 22,
+          "end_line": 56,
+          "label": "permission claims"
+        },
+        {
+          "path": "src/core/Ets.Core.Infrastructure/Authorization/ServiceCollectionExtensions.cs",
+          "line": 30,
+          "end_line": 59,
+          "label": "one policy per permission"
+        }
+      ]
+    },
+    {
+      "id": "endpoint",
+      "type": "backend",
+      "label": "Endpoint",
+      "sublabel": "CaptureAsxFuturesDeal",
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Presentation/Deals/CaptureAsxFuturesDeal.cs",
+          "line": 18,
+          "end_line": 55
+        }
+      ]
+    },
+    {
+      "id": "handler",
+      "type": "backend",
+      "label": "Command handler",
+      "sublabel": "decorated by the host",
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Application/Deals/CaptureAsxFuturesDeal/CaptureAsxFuturesDealCommandHandler.cs",
+          "line": 15,
+          "end_line": 60,
+          "label": "handler"
+        },
+        {
+          "path": "src/core/Ets.Core.Domain/ServiceCollectionExtensions.CQRS.cs",
+          "line": 54,
+          "end_line": 67,
+          "label": "AddMediatorPipeline"
+        }
+      ]
+    },
+    {
+      "id": "catalogue",
+      "type": "database",
+      "label": "ASX catalogue",
+      "sublabel": "deals.asx_products",
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/Products/AsxProductCatalogue.cs",
+          "line": 15,
+          "end_line": 44
+        }
+      ]
+    },
+    {
+      "id": "aggregate",
+      "type": "backend",
+      "label": "AsxFuturesDeal",
+      "sublabel": "event-sourced aggregate",
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Domain/Models/AsxFuturesDeal.cs",
+          "line": 49,
+          "end_line": 83
+        }
+      ]
+    },
+    {
+      "id": "uow",
+      "type": "database",
+      "label": "Unit of work",
+      "sublabel": "Marten deals_events",
+      "sources": [
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/EventStore/DealsUnitOfWork.cs",
+          "line": 18,
+          "end_line": 59
+        },
+        {
+          "path": "src/modules/deals/Ets.Modules.Deals.Infrastructure/EventStore/ExchangeDealRepository.cs",
+          "line": 6,
+          "end_line": 16,
+          "label": "Add only tracks"
+        }
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 295,
+      "label": "Authenticate and authorize"
+    },
+    {
+      "from": 300,
+      "to": 590,
+      "label": "Handle the command"
+    },
+    {
+      "from": 595,
+      "to": 775,
+      "label": "Persist and respond"
+    }
+  ],
+  "messages": [
+    {
+      "id": "post-deal",
+      "from": "spa",
+      "to": "auth",
+      "y": 165,
+      "label": "POST /api/deals/asx-futures",
+      "variant": "emphasis",
+      "note": "Access token from Keycloak (ets-web, PKCE)"
+    },
+    {
+      "id": "authorized",
+      "from": "auth",
+      "to": "endpoint",
+      "y": 230,
+      "label": "deals:capture passes",
+      "variant": "security",
+      "note": "Issuer and audience validated; Users adds permission claims from its schema"
+    },
+    {
+      "id": "send-command",
+      "from": "endpoint",
+      "to": "handler",
+      "y": 315,
+      "label": "CaptureAsxFuturesDealCommand",
+      "variant": "emphasis",
+      "note": "Through the logging and validation decorators; invalid input returns 400"
+    },
+    {
+      "id": "find-product",
+      "from": "handler",
+      "to": "catalogue",
+      "y": 395,
+      "label": "FindListedProductAsync",
+      "note": "ProductCode.Create decodes the code (BNH26 is Q126) first"
+    },
+    {
+      "id": "product-found",
+      "from": "catalogue",
+      "to": "handler",
+      "y": 465,
+      "label": "AsxProduct, or not listed (404)",
+      "variant": "return"
+    },
+    {
+      "id": "capture",
+      "from": "handler",
+      "to": "aggregate",
+      "y": 500,
+      "label": "Capture(product, direction, price, volume)",
+      "variant": "emphasis",
+      "note": "Checks the tick and whole lots; raises AsxFuturesDealCaptured"
+    },
+    {
+      "id": "deal-captured",
+      "from": "aggregate",
+      "to": "handler",
+      "y": 570,
+      "label": "Result<AsxFuturesDeal>",
+      "variant": "return"
+    },
+    {
+      "id": "save",
+      "from": "handler",
+      "to": "uow",
+      "y": 610,
+      "label": "Add, then SaveChangesAsync",
+      "variant": "emphasis",
+      "note": "Starts the deal's stream; a version clash is a 409 Conflict"
+    },
+    {
+      "id": "saved",
+      "from": "uow",
+      "to": "handler",
+      "y": 685,
+      "label": "Result",
+      "variant": "return"
+    },
+    {
+      "id": "deal-id",
+      "from": "handler",
+      "to": "endpoint",
+      "y": 720,
+      "label": "Result<Guid>",
+      "variant": "return"
+    },
+    {
+      "id": "created",
+      "from": "endpoint",
+      "to": "spa",
+      "y": 755,
+      "label": "201 Created, or problem details",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "auth",
+      "from": 160,
+      "to": 236,
+      "type": "security"
+    },
+    {
+      "participant": "endpoint",
+      "from": 225,
+      "to": 761,
+      "type": "backend"
+    },
+    {
+      "participant": "handler",
+      "from": 310,
+      "to": 726,
+      "type": "backend"
+    },
+    {
+      "participant": "catalogue",
+      "from": 390,
+      "to": 471,
+      "type": "database"
+    },
+    {
+      "participant": "aggregate",
+      "from": 495,
+      "to": 576,
+      "type": "backend"
+    },
+    {
+      "participant": "uow",
+      "from": 605,
+      "to": 691,
+      "type": "database"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Result, not exceptions",
+      "items": [
+        "Every failure is a Result carrying a DomainError",
+        "ApiResults.Problem maps its type: Validation 400, NotFound 404, Conflict 409"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Event sourcing",
+      "items": [
+        "The aggregate changes only by applying the event it raises",
+        "The repository only tracks the deal; events are appended when the unit of work saves"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Current shape",
+      "items": [
+        "No integration event is published: there is no Wolverine outbox",
+        "The Location header names a read route that does not exist"
+      ]
+    }
+  ]
+}
