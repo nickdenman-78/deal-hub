@@ -12,7 +12,7 @@ internal sealed class KeycloakOptions
 {
     public const string SectionName = "Keycloak";
 
-    /// <summary>The realm URL, which is also the token issuer, e.g. <c>http://localhost:8080/realms/ets</c>.</summary>
+    /// <summary>The realm URL, which is also the token issuer, e.g. <c>https://localhost:8080/realms/ets</c>.</summary>
     public string? Authority { get; set; }
 
     /// <summary>
@@ -27,7 +27,7 @@ internal sealed class KeycloakOptions
     /// </summary>
     public string? ReferenceUiClientId { get; set; }
 
-    /// <summary>Only the local Keycloak container serves plain HTTP; everything else must be HTTPS.</summary>
+    /// <summary>Whether the discovery document must come over HTTPS. Keep it on; the local container serves HTTPS too.</summary>
     public bool RequireHttpsMetadata { get; set; } = true;
 
     internal bool IsValid()

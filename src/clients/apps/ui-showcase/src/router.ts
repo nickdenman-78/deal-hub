@@ -15,8 +15,8 @@ function toChildPath(absolutePath: string): string {
 }
 
 const leafRoutes: RouteRecordRaw[] = allLeaves()
-  // Blade stack path is replaced by the nested tree below.
-  .filter((item) => item.path !== '/patterns/blade-stack')
+  // Blade stack paths are replaced by the nested trees below.
+  .filter((item) => item.path !== '/patterns/blade-stack' && item.path !== '/patterns/deal-capture')
   .map((item) => ({
     path: toChildPath(item.path),
     name: item.path,
@@ -42,6 +42,31 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./layouts/DefaultLayout.vue'),
     children: [
       ...leafRoutes,
+      {
+        path: 'patterns/deal-capture',
+        component: () => import('./views/patterns/deals/DealCaptureView.vue'),
+        meta: { title: 'Deal capture', flush: true },
+        children: [
+          {
+            path: '',
+            component: () => import('./views/patterns/deals/DealsListBlade.vue'),
+            meta: { blade: true },
+            children: [
+              {
+                // Static path before `:id` so “new” is not captured as a deal id.
+                path: 'new',
+                component: () => import('./views/patterns/deals/CaptureDealBlade.vue'),
+                meta: { blade: true },
+              },
+              {
+                path: ':id',
+                component: () => import('./views/patterns/deals/DealBlade.vue'),
+                meta: { blade: true },
+              },
+            ],
+          },
+        ],
+      },
       {
         path: 'patterns/blade-stack',
         component: () => import('./views/BladesView.vue'),

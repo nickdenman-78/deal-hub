@@ -1,12 +1,26 @@
 <script setup lang="ts">
-import { EmptyState, PageHeader } from '@ets/ui';
+/*
+ * The Deals module: the deals list, a deal's details and capturing an ASX futures deal, as one blade stack.
+ * Design: https://claude.ai/artifact/8KSmHf3W3jyRHZQCkN1en8 (prototype: ui-showcase Patterns › Deal capture).
+ */
+import { BladeStack } from '@ets/ui';
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <PageHeader title="Deals" icon="file-text" />
-  <EmptyState
-    icon="construction"
-    title="Nothing here yet"
-    description="Deal capture for ASX futures, swaps, caps and options lands here."
-  />
+  <div class="deals">
+    <BladeStack>
+      <RouterView />
+    </BladeStack>
+  </div>
 </template>
+
+<style scoped>
+.deals {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+</style>

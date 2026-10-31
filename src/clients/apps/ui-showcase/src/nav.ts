@@ -195,6 +195,10 @@ export const nav: NavEntry[] = [
       flush: true,
     }),
     leaf('List page', '/patterns/list-page', () => import('./views/patterns/ListPageView.vue'), { flush: true }),
+    leaf('Deal capture', '/patterns/deal-capture', () => import('./views/patterns/deals/DealCaptureView.vue'), {
+      match: 'prefix',
+      flush: true,
+    }),
   ]),
 ];
 

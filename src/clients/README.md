@@ -28,7 +28,7 @@ pnpm format            # prettier
 ## Running the SPA locally
 
 1. Start the AppHost (`src/aspire/Ets.Aspire.AppHost`). It runs Keycloak on
-   `:8080` and the API on `:5201`.
+   `:8080` and the API on `https://localhost:7201`.
 2. `pnpm dev` from this directory. `/api` is proxied to the API, so no CORS
    entry is needed.
 3. Open http://localhost:5300 and sign in as `trader` / `trader`.

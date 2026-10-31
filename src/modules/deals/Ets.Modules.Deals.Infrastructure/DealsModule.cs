@@ -1,4 +1,5 @@
 using Ets.Modules.Deals.Application;
+using Ets.Modules.Deals.Application.Deals;
 using Ets.Modules.Deals.Domain.Repositories;
 using Ets.Modules.Deals.Domain.Services;
 using Ets.Modules.Deals.Infrastructure.EventStore;
@@ -42,12 +43,14 @@ public static class DealsModule
 
         string? connectionString = configuration.GetConnectionString(DealsDbContext.ConnectionStringName);
         services.AddDbContext<DealsDbContext>(options => DealsDbContext.Configure(options, connectionString));
+        services.AddHostedService<DealsDevelopmentMigrator>();
 
         services.AddScoped<IAsxProductCatalogue, AsxProductCatalogue>();
 
         services.AddMartenStore<IDealsStore>(DealsEventStore.Configure);
         services.AddScoped<DealsEventSession>();
         services.AddScoped<IExchangeDealRepository, ExchangeDealRepository>();
+        services.AddScoped<IAsxFuturesDealQueries, AsxFuturesDealQueries>();
         services.AddScoped<IDealsUnitOfWork, DealsUnitOfWork>();
 
         return services;

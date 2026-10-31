@@ -1,6 +1,7 @@
 using Ets.Core.Domain.Models;
 using Ets.Core.Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Ets.Core.Infrastructure.Persistence;
 
@@ -12,6 +13,11 @@ namespace Ets.Core.Infrastructure.Persistence;
 ///         <item>Stamps <see cref="IAudited" /> entities with who and when, in UTC.</item>
 ///         <item>Turns deletes of <see cref="ISoftDelete" /> entities into a flag.</item>
 ///         <item>Stores every enum as its member name (max 64 characters), never an ordinal.</item>
+///         <item>
+///             Writes every <see cref="DateTimeOffset" /> in UTC. Npgsql only accepts offset 0 for
+///             <c>timestamp with time zone</c>, and domain code stamps market time (UTC+10) from
+///             <see cref="IDateTimeProvider.Now" />. The instant is unchanged; it reads back with offset 0.
+///         </item>
 ///     </list>
 ///     A module's context sets its default schema and calls
 ///     <see cref="ModelBuilderExtensions.ApplyAllConfigurations{TDbContext}" /> in <c>OnModelCreating</c>,
@@ -59,6 +65,10 @@ public abstract class DbContextBase : DbContext
             .Properties<Enum>()
             .HaveConversion<string>()
             .HaveMaxLength(DatabaseDefaults.MaxLengthEnum);
+
+        configurationBuilder
+            .Properties<DateTimeOffset>()
+            .HaveConversion<UtcDateTimeOffsetConverter>();
 
         base.ConfigureConventions(configurationBuilder);
     }
@@ -140,4 +150,9 @@ public abstract class DbContextBase : DbContext
             ? _contextUser.Name
             : $"{_contextUser.Name} ({_contextUser.Email})";
     }
+
+    /// <summary>Normalises a <see cref="DateTimeOffset" /> to UTC on the way to the database.</summary>
+    private sealed class UtcDateTimeOffsetConverter() : ValueConverter<DateTimeOffset, DateTimeOffset>(
+        value => value.ToUniversalTime(),
+        value => value);
 }

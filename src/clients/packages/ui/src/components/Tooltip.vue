@@ -16,14 +16,20 @@ withDefaults(
     openDelay?: number;
     disabled?: boolean;
     positionArea?: string;
+    /**
+     * The activator's element. A `<button>` by default, which suits plain text. Wrapping something that is already
+     * interactive (a link, a button) needs `span`: a disabled tooltip disables its `<button>` activator, and a
+     * disabled button swallows every click on what is inside it.
+     */
+    as?: 'button' | 'span';
   }>(),
-  { openDelay: 400, positionArea: undefined },
+  { openDelay: 400, positionArea: undefined, as: 'button' },
 );
 </script>
 
 <template>
   <Tooltip.Root :open-delay="openDelay" :disabled="disabled" :position-area="positionArea">
-    <Tooltip.Activator class="r-tooltip__activator">
+    <Tooltip.Activator :as="as" class="r-tooltip__activator">
       <slot />
     </Tooltip.Activator>
     <Tooltip.Content class="r-tooltip">{{ text }}</Tooltip.Content>

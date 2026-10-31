@@ -66,7 +66,7 @@ flowchart LR
   AppHost --> RabbitMQ[RabbitMQ<br/>+ management UI]
   AppHost --> Keycloak[Keycloak :8080<br/>realm ets]
   AppHost --> Seq[Seq]
-  AppHost --> Api[ets-api<br/>Ets.Servers.Api :5201]
+  AppHost --> Api[ets-api<br/>Ets.Servers.Api :7201]
   Api -. waits for .-> Postgres
   Api -. waits for .-> Redis
   Api -. waits for .-> RabbitMQ
@@ -106,21 +106,21 @@ Open <http://localhost:5300> and sign in through Keycloak as the local test user
 Development the API seeds that user with the `Trader` and `Administrator` roles (`Users:DevelopmentSeed` in
 `src/hosts/Ets.Servers.Api/appsettings.Development.json`), so the Deals and Users screens are available.
 
-The dev server proxies `/api` to the API on `:5201`, so the API needs no CORS entry. Edits to `.vue` and `.ts`
+The dev server proxies `/api` to the API on `https://localhost:7201`, so the API needs no CORS entry. Edits to `.vue` and `.ts`
 files reload in place; restart `pnpm dev` after changing `vite.config.ts` or `.env.local`.
 
 ## Local URLs
 
-| What                     | URL                                                                                 |
-| ------------------------ | ----------------------------------------------------------------------------------- |
-| ETS web app              | <http://localhost:5300>                                                             |
-| API reference (Scalar)   | <http://localhost:5201/scalar/> — sign in as `trader` from its authentication panel |
-| API health               | <http://localhost:5201/health> (ready) and <http://localhost:5201/alive> (live)     |
-| Keycloak admin console   | <http://localhost:8080> — see below for the credentials                             |
-| Aspire dashboard         | Printed by the AppHost (`https://localhost:17201` under `dotnet run`)               |
-| Seq, RabbitMQ management | Linked from the resources in the Aspire dashboard                                   |
-| UI showcase              | <http://localhost:5303>, after `pnpm showcase` in `src/clients`                     |
-| This docs site           | <http://localhost:5173>, see [The developer docs site](./developer-docs)            |
+| What                     | URL                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| ETS web app              | <http://localhost:5300>                                                              |
+| API reference (Scalar)   | <https://localhost:7201/scalar/> — sign in as `trader` from its authentication panel |
+| API health               | <https://localhost:7201/health> (ready) and <https://localhost:7201/alive> (live)    |
+| Keycloak admin console   | <https://localhost:8080> — see below for the credentials                             |
+| Aspire dashboard         | Printed by the AppHost (`https://localhost:17201` under `dotnet run`)                |
+| Seq, RabbitMQ management | Linked from the resources in the Aspire dashboard                                    |
+| UI showcase              | <http://localhost:5303>, after `pnpm showcase` in `src/clients`                      |
+| This docs site           | <http://localhost:5173>, see [The developer docs site](./developer-docs)             |
 
 The Keycloak admin user is `admin`. Its password is generated on the first run and kept in the AppHost's user
 secrets as `Parameters:keycloak-password`, and the dashboard shows it among the `keycloak` resource's parameters.
@@ -143,12 +143,12 @@ dotnet user-secrets list --project src/aspire/Ets.Aspire.AppHost
 The web app's defaults match the AppHost. To override them, copy `src/clients/apps/ets/.env.example` to
 `.env.local` in the same folder and change what you need:
 
-| Variable              | Default                            | Used for                                   |
-| --------------------- | ---------------------------------- | ------------------------------------------ |
-| `VITE_OIDC_AUTHORITY` | `http://localhost:8080/realms/ets` | The Keycloak realm the SPA signs in at     |
-| `VITE_OIDC_CLIENT_ID` | `ets-web`                          | The realm's public PKCE client for the SPA |
-| `VITE_OIDC_SCOPE`     | `openid profile email`             | The scopes the SPA requests                |
-| `ETS_API`             | `http://localhost:5201`            | Where the dev server proxies `/api`        |
+| Variable              | Default                             | Used for                                   |
+| --------------------- | ----------------------------------- | ------------------------------------------ |
+| `VITE_OIDC_AUTHORITY` | `https://localhost:8080/realms/ets` | The Keycloak realm the SPA signs in at     |
+| `VITE_OIDC_CLIENT_ID` | `ets-web`                           | The realm's public PKCE client for the SPA |
+| `VITE_OIDC_SCOPE`     | `openid profile email`              | The scopes the SPA requests                |
+| `ETS_API`             | `https://localhost:7201`            | Where the dev server proxies `/api`        |
 
 ::: warning Fixed ports
 Port `5300` is fixed (`strictPort`) because `http://localhost:5300/auth/callback` is the redirect URI registered on

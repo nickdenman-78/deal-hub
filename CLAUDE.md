@@ -61,7 +61,7 @@ Frontend — run from `src/clients` (pnpm is pinned to 10.18.0 by `packageManage
 
 ```bash
 pnpm install                                   # whole workspace; after any package.json / lockfile change
-pnpm dev                                       # ETS SPA on http://localhost:5300, /api proxied to :5201 (needs the AppHost running)
+pnpm dev                                       # ETS SPA on http://localhost:5300, /api proxied to https://localhost:7201 (needs the AppHost running)
 pnpm build                                     # vue-tsc + vite build → apps/ets/dist
 pnpm typecheck                                 # vue-tsc across every package
 pnpm test                                      # vitest across every package

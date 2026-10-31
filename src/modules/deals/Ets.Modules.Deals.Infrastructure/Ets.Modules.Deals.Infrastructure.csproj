@@ -29,6 +29,11 @@
         </None>
     </ItemGroup>
 
+    <!-- The Development copy of ASX's contract size schedule, loaded by DealsDevelopmentMigrator. -->
+    <ItemGroup>
+        <EmbeddedResource Include="Products\asx-contract-sizes.csv"/>
+    </ItemGroup>
+
     <!-- Deliberately does NOT reference Presentation: the route-side composition root lives there, so
          neither layer depends on the other. The host composes both (ADR-0003). -->
     <ItemGroup>

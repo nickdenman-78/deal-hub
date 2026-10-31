@@ -7,7 +7,7 @@
  * hover glance. Expanded (and always on narrow, where the drawer shows labels)
  * the label sits beside the icon.
  */
-import { computed, inject, useSlots } from 'vue';
+import { computed, inject, useSlots, type FunctionalComponent } from 'vue';
 import { RouterLink, type RouteLocationRaw } from 'vue-router';
 import Icon from '../components/Icon.vue';
 import Tooltip from '../components/Tooltip.vue';
@@ -53,6 +53,13 @@ const layout = inject(appLayoutKey, null);
 
 const rail = computed(() => Boolean(layout?.collapsed.value && !layout?.isNarrow.value));
 
+/** Renders its default slot and nothing else: the row without a tooltip. */
+const Passthrough: FunctionalComponent = (_props, { slots }) => slots.default?.();
+
+const tooltipBind = computed(() =>
+  rail.value ? { text: props.label, positionArea: 'right', as: 'span' as const } : {},
+);
+
 const tag = computed(() => {
   if (props.to !== undefined) return RouterLink;
   if (props.href !== undefined) return 'a';
@@ -87,7 +94,10 @@ function onClick(event: MouseEvent) {
 </script>
 
 <template>
-  <Tooltip :text="label" :disabled="!rail" position-area="right">
+  <!-- The tooltip only exists in the rail. Expanded, the label is on screen, and a disabled tooltip would still
+       wrap the link in a disabled activator that swallows its clicks. A span activator, because the row is
+       already a link and must not sit inside a <button>. -->
+  <component :is="rail ? Tooltip : Passthrough" v-bind="tooltipBind">
     <component
       :is="tag"
       class="r-app-nav-item"
@@ -105,5 +115,5 @@ function onClick(event: MouseEvent) {
         <slot />
       </span>
     </component>
-  </Tooltip>
+  </component>
 </template>

@@ -77,7 +77,7 @@ The sections each module binds, named by their `SectionName` constants.
 | Section | Bound by | Notes |
 |---|---|---|
 | `Holidays` | `Ets.Core.Application` — `HolidayServiceOptions.SectionName` | Optional. Holiday calendar cache size and expiry; absent means defaults (caching on, no expiry). |
-| `Keycloak` | `Ets.Servers.Api` — `KeycloakOptions.SectionName` | Required: `Authority` (realm URL, also the issuer) and `Audience` (`ets-api`). `ReferenceUiClientId` lets the Scalar UI sign in, Development only. `RequireHttpsMetadata` is `false` only for the local container. The AppHost supplies `Authority`. |
+| `Keycloak` | `Ets.Servers.Api` — `KeycloakOptions.SectionName` | Required: `Authority` (realm URL, also the issuer) and `Audience` (`ets-api`). `ReferenceUiClientId` lets the Scalar UI sign in, Development only. `RequireHttpsMetadata` stays `true`, the local container included (it serves HTTPS with the Aspire developer certificate). The AppHost supplies `Authority`. |
 | `Seq` | `Ets.Servers.Api` — `SeqOptions.SectionName` | Optional. `ServerUrl` (and `ApiKey`) for the Serilog sink; absent means console only. The AppHost supplies `ServerUrl`. |
 | `Cors:Origins` | `Ets.Servers.Api` | Optional. Browser origins allowed to call the API; empty means none. |
 | `ConnectionStrings:ets` | `Ets.Servers.Api` (`AddNpgsqlDataSource`) and `Ets.Modules.Deals.Infrastructure` — `DealsDbContext.ConnectionStringName` | The AppHost passes it. The host's shared `NpgsqlDataSource` reads it for the Marten stores; `DealsDbContext` still reads it directly with `UseNpgsql`. |

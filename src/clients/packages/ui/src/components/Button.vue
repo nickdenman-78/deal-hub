@@ -196,6 +196,8 @@ watchEffect(
   border-radius: var(--r-sm);
   font-family: var(--font-ui);
   line-height: 1;
+  /* Rendered as a link (as="a" or a RouterLink), it must not pick up the global link underline. */
+  text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
   transition:

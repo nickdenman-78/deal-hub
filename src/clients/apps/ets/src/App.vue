@@ -42,6 +42,7 @@ const { me } = storeToRefs(session);
 
 // Public routes (callback, errors) render without the shell chrome.
 const bare = computed(() => route.meta.public === true);
+const flush = computed(() => route.meta.flush === true);
 
 const navItems = computed(() =>
   router
@@ -57,7 +58,7 @@ function isActive(path: string): boolean {
 
 <template>
   <RouterView v-if="bare" />
-  <div v-else class="ets-shell">
+  <div v-else class="ets-shell" :class="{ 'ets-shell--flush': flush }">
     <AppLayout v-model:collapsed="collapsed" chrome="both" nav-title="ETS">
       <template #sidebar>
         <AppSidebar>
@@ -110,5 +111,9 @@ function isActive(path: string): boolean {
 
 .ets-shell :deep(.r-app-layout__main) {
   padding: var(--sp-4);
+}
+
+.ets-shell--flush :deep(.r-app-layout__main) {
+  padding: 0;
 }
 </style>

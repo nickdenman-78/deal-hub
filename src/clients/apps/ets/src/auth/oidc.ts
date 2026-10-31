@@ -11,7 +11,7 @@ import { UserManager, WebStorageStateStore, type User } from 'oidc-client-ts';
 const origin = window.location.origin;
 
 export const userManager = new UserManager({
-  authority: import.meta.env.VITE_OIDC_AUTHORITY ?? 'http://localhost:8080/realms/ets',
+  authority: import.meta.env.VITE_OIDC_AUTHORITY ?? 'https://localhost:8080/realms/ets',
   client_id: import.meta.env.VITE_OIDC_CLIENT_ID ?? 'ets-web',
   scope: import.meta.env.VITE_OIDC_SCOPE ?? 'openid profile email',
   redirect_uri: `${origin}/auth/callback`,

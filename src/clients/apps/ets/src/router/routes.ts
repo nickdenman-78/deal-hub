@@ -9,6 +9,8 @@ declare module 'vue-router' {
     permission?: string;
     /** Sidebar entry. Routes without one are reachable but not listed. */
     nav?: { label: string; icon: string };
+    /** The view fills the main area edge to edge (a blade stack), so the shell drops its padding. */
+    flush?: boolean;
   }
 }
 
@@ -20,10 +22,33 @@ export const routes: RouteRecordRaw[] = [
     meta: { nav: { label: 'Home', icon: 'house' } },
   },
   {
+    // A blade stack: the list is the root blade, and a deal or the capture form opens beside it.
     path: '/deals',
-    name: 'deals',
     component: () => import('@/modules/deals/DealsView.vue'),
-    meta: { permission: DealsPermissions.Read, nav: { label: 'Deals', icon: 'file-text' } },
+    meta: { permission: DealsPermissions.Read, nav: { label: 'Deals', icon: 'file-text' }, flush: true },
+    children: [
+      {
+        path: '',
+        name: 'deals',
+        component: () => import('@/modules/deals/DealsListBlade.vue'),
+        meta: { blade: true },
+        children: [
+          {
+            // Before ':id', so "new" is never read as a deal id.
+            path: 'new',
+            name: 'deal-capture',
+            component: () => import('@/modules/deals/CaptureDealBlade.vue'),
+            meta: { blade: true, permission: DealsPermissions.Capture },
+          },
+          {
+            path: ':id',
+            name: 'deal',
+            component: () => import('@/modules/deals/DealBlade.vue'),
+            meta: { blade: true },
+          },
+        ],
+      },
+    ],
   },
   {
     // Ungated until the Settlement module publishes its permission catalogue.

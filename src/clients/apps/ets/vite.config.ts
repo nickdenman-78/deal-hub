@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, __dirname, ''), ...process.env };
-  const api = env.ETS_API ?? 'http://localhost:5201';
+  const api = env.ETS_API ?? 'https://localhost:7201';
 
   return {
     plugins: [vue()],
@@ -42,7 +42,9 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       proxy: {
         // Same-origin /api in dev, so the API needs no CORS entry for Vite.
-        '/api': { target: api, changeOrigin: true, ws: true },
+        // `secure: false` because Node does not read the OS certificate store, so it cannot verify the ASP.NET Core
+        // developer certificate the API serves locally. Dev server only; nothing here ships.
+        '/api': { target: api, changeOrigin: true, ws: true, secure: false },
       },
     },
     test: {
