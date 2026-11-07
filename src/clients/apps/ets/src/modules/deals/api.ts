@@ -82,3 +82,9 @@ export function problemOf(error: unknown): Problem | undefined {
  * Bumped after a deal is captured, so the list reloads without the capture blade reaching into it.
  */
 export const dealsChanged = ref(0);
+
+/**
+ * The id of the deal captured most recently in this tab. The list waits for it to appear, because deals are read
+ * from a read model that a background subscription fills a moment after the capture is stored.
+ */
+export const lastCapturedDealId = ref<string>();

@@ -23,13 +23,14 @@ import {
   type SelectOption,
   type ToggleOption,
 } from '@ets/ui';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router';
 import { DealsPermissions } from '@/lib/permissions';
 import { useSessionStore } from '@/stores/session';
-import { dealsChanged, listDeals, type AsxFuturesDeal, type Direction } from './api';
+import { dealsChanged, lastCapturedDealId, listDeals, type AsxFuturesDeal, type Direction } from './api';
 import DirectionTag from './components/DirectionTag.vue';
 import { aestDay, formatInstant, formatNumber } from './format';
+import { dealsLive, useDealsChanged } from './live';
 import { isTyping } from './quote';
 
 interface Row extends Record<string, unknown> {
@@ -81,8 +82,62 @@ async function load() {
   }
 }
 
+/*
+ * The list is a read model that a background subscription fills from the event stream. The API pushes a notice once
+ * it holds a change (live.ts), from this user or anyone else, and the list reloads quietly on it. If the live
+ * connection is down, fall back after this user's own capture: reload every half second until the new deal is
+ * there, for up to ten seconds.
+ */
+const CATCH_UP_INTERVAL_MS = 500;
+const CATCH_UP_TIMEOUT_MS = 10_000;
+let catchUpTimer: ReturnType<typeof setTimeout> | undefined;
+
+const hasDeal = (id: string | undefined) => id === undefined || deals.value.some((d) => d.id === id);
+
+async function catchUp(id: string | undefined, deadline: number) {
+  try {
+    deals.value = await listDeals();
+    loadError.value = false;
+  } catch {
+    // Keep what is shown and try again on the next tick.
+  }
+  if (!hasDeal(id) && Date.now() < deadline) {
+    catchUpTimer = setTimeout(() => void catchUp(id, deadline), CATCH_UP_INTERVAL_MS);
+  }
+}
+
+async function onDealsChanged() {
+  clearTimeout(catchUpTimer);
+  const id = lastCapturedDealId.value;
+  await load();
+  if (!hasDeal(id) && !dealsLive.value) {
+    catchUpTimer = setTimeout(() => void catchUp(id, Date.now() + CATCH_UP_TIMEOUT_MS), CATCH_UP_INTERVAL_MS);
+  }
+}
+
+// Coalesce a burst of notices into one reload in flight plus at most one more.
+let reloading: Promise<void> | undefined;
+let reloadAgain = false;
+
+async function reloadOnNotice() {
+  if (reloading) {
+    reloadAgain = true;
+    return;
+  }
+  do {
+    reloadAgain = false;
+    clearTimeout(catchUpTimer);
+    reloading = catchUp(undefined, 0);
+    await reloading;
+    reloading = undefined;
+  } while (reloadAgain);
+}
+
+useDealsChanged(() => void reloadOnNotice());
+
 onMounted(load);
-watch(dealsChanged, load);
+watch(dealsChanged, () => void onDealsChanged());
+onBeforeUnmount(() => clearTimeout(catchUpTimer));
 
 const sort = ref<DataTableSort>({ id: 'captured', direction: 'desc' });
 

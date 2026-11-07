@@ -1,4 +1,6 @@
 using Ets.Core.Presentation.Endpoints;
+using Ets.Modules.Deals.Application.Deals;
+using Ets.Modules.Deals.Presentation.Realtime;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -29,6 +31,9 @@ public static class DealsEndpoints
 
         services.AddSingleton(policies);
 
+        // Screens hear about deal changes over SignalR (WebSockets). The host adds SignalR itself.
+        services.AddSingleton<IDealsChangedNotifier, SignalRDealsChangedNotifier>();
+
         return services.AddEndpoints(AssemblyReference.Assembly);
     }
 
@@ -55,6 +60,11 @@ public static class DealsEndpoints
         group.WithGroupName(OpenApiDocuments.Deals);
 
         group.MapEndpoints(AssemblyReference.Assembly);
+
+        // Mapped beside the group rather than in it, so the hub stays out of the OpenAPI document.
+        app.MapHub<DealsHub>("/api/deals/hub")
+            .RequirePolicy(app.Policies().Read)
+            .ExcludeFromDescription();
 
         return app;
     }

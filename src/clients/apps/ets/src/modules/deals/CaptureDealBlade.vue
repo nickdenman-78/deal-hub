@@ -9,7 +9,7 @@ import { Blade, Button, Input, Message, NumberInput, ToggleGroup, useToast, type
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
-import { captureDeal, dealsChanged, lookUpProduct, problemOf, type Direction } from './api';
+import { captureDeal, dealsChanged, lastCapturedDealId, lookUpProduct, problemOf, type Direction } from './api';
 import ProductCodeDecode from './components/ProductCodeDecode.vue';
 import { formatNumber } from './format';
 import { errorsOfProblem, isTyping, validateQuote, type ProductState, type QuoteErrors } from './quote';
@@ -139,6 +139,7 @@ async function capture() {
       volume: Number(volume.value),
     });
     saved.value = true;
+    lastCapturedDealId.value = id;
     dealsChanged.value++;
     toast.success('Deal captured', `${chosenDirection.value} ${volume.value} MW ${typedCode.value}`);
     await router.push(`/deals/${id}`);

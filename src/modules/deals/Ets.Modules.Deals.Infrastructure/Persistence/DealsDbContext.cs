@@ -32,6 +32,8 @@ public sealed class DealsDbContext : DbContextBase
 
     internal DbSet<DbAsxProduct> AsxProducts => Set<DbAsxProduct>();
 
+    internal DbSet<DbAsxFuturesDeal> AsxFuturesDeals => Set<DbAsxFuturesDeal>();
+
     /// <summary>The provider settings shared by the module's registration and the design-time factory.</summary>
     internal static DbContextOptionsBuilder Configure(DbContextOptionsBuilder options, string? connectionString)
     {

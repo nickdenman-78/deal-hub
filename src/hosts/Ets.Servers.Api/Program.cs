@@ -83,6 +83,10 @@ builder.Services.AddOpenApi(
         options.AddKeycloakOAuth2(builder.Configuration);
     });
 
+// SignalR for screens that update when data changes (WebSockets, falling back to SSE or long polling). Modules
+// map their own hubs under /api/{module}/hub and push through ports such as IDealsChangedNotifier.
+builder.Services.AddSignalR();
+
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
     .WithOrigins(builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? [])
     .AllowAnyHeader()

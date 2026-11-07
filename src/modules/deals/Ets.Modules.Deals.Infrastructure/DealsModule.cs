@@ -5,6 +5,8 @@ using Ets.Modules.Deals.Domain.Services;
 using Ets.Modules.Deals.Infrastructure.EventStore;
 using Ets.Modules.Deals.Infrastructure.Persistence;
 using Ets.Modules.Deals.Infrastructure.Products;
+using Ets.Modules.Deals.Infrastructure.ReadModels;
+using JasperFx.Events.Daemon;
 using Marten;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +49,11 @@ public static class DealsModule
 
         services.AddScoped<IAsxProductCatalogue, AsxProductCatalogue>();
 
-        services.AddMartenStore<IDealsStore>(DealsEventStore.Configure);
+        // The async daemon runs the read model subscriptions (ADR-0013). Solo: one API node for now; HotCold once
+        // there are several.
+        services.AddMartenStore<IDealsStore>(DealsEventStore.Configure)
+            .AddSubscriptionWithServices<AsxFuturesDealsReadModel>(ServiceLifetime.Singleton)
+            .AddAsyncDaemon(DaemonMode.Solo);
         services.AddScoped<DealsEventSession>();
         services.AddScoped<IExchangeDealRepository, ExchangeDealRepository>();
         services.AddScoped<IAsxFuturesDealQueries, AsxFuturesDealQueries>();

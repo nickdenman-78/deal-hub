@@ -1,4 +1,5 @@
 using Ets.Modules.Deals.Domain.Events;
+using Ets.Modules.Deals.Domain.ValueObjects;
 
 namespace Ets.Modules.Deals.Application.Deals;
 
@@ -24,16 +25,35 @@ public sealed record AsxFuturesDealResponse(
     {
         ArgumentNullException.ThrowIfNull(captured);
 
-        decimal volume = captured.Volume.Value ?? 0m;
-        decimal lotSize = captured.Product.ContractSize.Energy.Value ?? 0m;
-
-        return new AsxFuturesDealResponse(
+        return From(
             captured.DealId.Value,
+            captured.Product,
             captured.Direction.Name,
             captured.Price.Value ?? 0m,
+            captured.Volume.Value ?? 0m,
+            captured.OccurredAt);
+    }
+
+    /// <summary>A deal from a read model; contracted energy is the volume times the product's contract size.</summary>
+    public static AsxFuturesDealResponse From(
+        Guid id,
+        AsxProduct product,
+        string direction,
+        decimal price,
+        decimal volume,
+        DateTimeOffset capturedAt)
+    {
+        ArgumentNullException.ThrowIfNull(product);
+
+        decimal lotSize = product.ContractSize.Energy.Value ?? 0m;
+
+        return new AsxFuturesDealResponse(
+            id,
+            direction,
+            price,
             volume,
             volume * lotSize,
-            captured.OccurredAt,
-            AsxProductResponse.From(captured.Product));
+            capturedAt,
+            AsxProductResponse.From(product));
     }
 }

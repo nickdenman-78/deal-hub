@@ -14,12 +14,13 @@ import {
   type DefinitionItem,
   type TimelineItem,
 } from '@ets/ui';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import { getDeal, type AsxFuturesDeal } from './api';
 import DirectionTag from './components/DirectionTag.vue';
 import { formatDate, formatExpiry, formatInstant, formatNumber } from './format';
+import { useDealsChanged } from './live';
 
 const route = useRoute();
 const router = useRouter();
@@ -27,17 +28,55 @@ const router = useRouter();
 const deal = ref<AsxFuturesDeal>();
 const state = ref<'loading' | 'loaded' | 'not-found' | 'error'>('loading');
 
+/*
+ * Deals are read from a read model that a background subscription fills from the event stream, so a deal that was
+ * captured a moment ago can 404 for a short while. Retry a 404 for up to ten seconds before calling it missing; a
+ * live notice for this deal (below) usually ends the wait sooner.
+ */
+const NOT_FOUND_RETRIES = 20;
+const NOT_FOUND_RETRY_MS = 500;
+let disposed = false;
+
+const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function load() {
   state.value = 'loading';
-  try {
-    deal.value = await getDeal(route.params.id as string);
-    state.value = 'loaded';
-  } catch (error) {
-    state.value = error instanceof ApiError && error.status === 404 ? 'not-found' : 'error';
+  const id = route.params.id as string;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      deal.value = await getDeal(id);
+      state.value = 'loaded';
+      return;
+    } catch (error) {
+      const notFound = error instanceof ApiError && error.status === 404;
+      if (notFound && attempt < NOT_FOUND_RETRIES && !disposed) {
+        await pause(NOT_FOUND_RETRY_MS);
+        continue;
+      }
+      state.value = notFound ? 'not-found' : 'error';
+      return;
+    }
   }
 }
 
 onMounted(load);
+
+// Live notice that this deal was written or changed: show the latest without a loading flash.
+async function refresh(dealIds: string[] | null) {
+  const id = route.params.id as string;
+  if ((dealIds !== null && !dealIds.includes(id)) || state.value === 'error') return;
+  try {
+    deal.value = await getDeal(id);
+    state.value = 'loaded';
+  } catch {
+    // Keep what is shown; the retry loop or the next notice will settle it.
+  }
+}
+
+useDealsChanged((dealIds) => void refresh(dealIds));
+onBeforeUnmount(() => {
+  disposed = true;
+});
 
 const title = computed(() => {
   if (deal.value) return `${deal.value.direction} ${deal.value.volume} MW ${deal.value.product.productCode}`;

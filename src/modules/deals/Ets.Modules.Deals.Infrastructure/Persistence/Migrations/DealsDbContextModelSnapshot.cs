@@ -23,6 +23,119 @@ namespace Ets.Modules.Deals.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Ets.Modules.Deals.Infrastructure.Persistence.Entities.DbAsxFuturesDeal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasColumnOrder(1);
+
+                    b.Property<DateTimeOffset>("CapturedAt")
+                        .HasColumnType("timestamptz")
+                        .HasColumnName("captured_at")
+                        .HasColumnOrder(24);
+
+                    b.Property<int>("ContractDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("contract_days")
+                        .HasColumnOrder(18);
+
+                    b.Property<decimal>("ContractSize")
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("contract_size")
+                        .HasColumnOrder(19);
+
+                    b.Property<decimal>("ContractedEnergy")
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("contracted_energy")
+                        .HasColumnOrder(23);
+
+                    b.Property<string>("Direction")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)")
+                        .HasColumnName("direction")
+                        .HasColumnOrder(20);
+
+                    b.Property<string>("LoadProfile")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("load_profile")
+                        .HasColumnOrder(12);
+
+                    b.Property<string>("Payoff")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("payoff")
+                        .HasColumnOrder(13);
+
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("period")
+                        .HasColumnOrder(14);
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("price")
+                        .HasColumnOrder(21);
+
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("product_code")
+                        .HasColumnOrder(10);
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)")
+                        .HasColumnName("region")
+                        .HasColumnOrder(11);
+
+                    b.Property<string>("Term")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("term")
+                        .HasColumnOrder(15);
+
+                    b.Property<DateOnly>("TermEnd")
+                        .HasColumnType("date")
+                        .HasColumnName("term_end")
+                        .HasColumnOrder(17);
+
+                    b.Property<DateOnly>("TermStart")
+                        .HasColumnType("date")
+                        .HasColumnName("term_start")
+                        .HasColumnOrder(16);
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint")
+                        .HasColumnName("version")
+                        .HasColumnOrder(2);
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("numeric(18,6)")
+                        .HasColumnName("volume")
+                        .HasColumnOrder(22);
+
+                    b.HasKey("Id")
+                        .HasName("pk_asx_futures_deals");
+
+                    b.HasIndex("CapturedAt")
+                        .HasDatabaseName("ix_asx_futures_deals_captured_at");
+
+                    b.HasIndex("ProductCode")
+                        .HasDatabaseName("ix_asx_futures_deals_product_code");
+
+                    b.ToTable("asx_futures_deals", "deals");
+                });
+
             modelBuilder.Entity("Ets.Modules.Deals.Infrastructure.Persistence.Entities.DbAsxProduct", b =>
                 {
                     b.Property<string>("ProductCode")
